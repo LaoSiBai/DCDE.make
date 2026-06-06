@@ -28,32 +28,50 @@ export default function HomePage() {
       }, '-=0.5')
   }, { scope: listRef })
 
-  // Hover focus effect with contextSafe
-  const { contextSafe } = useGSAP({ scope: listRef })
+  // Hover focus effect — event delegation on container
+  useGSAP(() => {
+    const container = listRef.current
+    if (!container) return
 
-  const handleMouseEnter = contextSafe((e) => {
-    const rows = listRef.current?.querySelectorAll('.tool-row')
-    if (!rows) return
-    rows.forEach((row) => {
-      if (row === e.currentTarget) {
-        gsap.to(row, { opacity: 1, duration: 0.25 })
-        gsap.to(row.querySelector('.tool-name'), { color: '#338bff', duration: 0.25 })
-        gsap.to(row.querySelector('.tool-arrow'), { x: 8, opacity: 1, duration: 0.25, ease: 'power2.out' })
-      } else {
-        gsap.to(row, { opacity: 0.08, duration: 0.25 })
-      }
-    })
-  })
+    const rows = container.querySelectorAll('.tool-row')
 
-  const handleMouseLeave = contextSafe(() => {
-    const rows = listRef.current?.querySelectorAll('.tool-row')
-    if (!rows) return
-    rows.forEach((row) => {
-      gsap.to(row, { opacity: 1, duration: 0.35 })
-      gsap.to(row.querySelector('.tool-name'), { color: '#ffffff', duration: 0.35 })
-      gsap.to(row.querySelector('.tool-arrow'), { x: 0, opacity: 0, duration: 0.35 })
-    })
-  })
+    const focusRow = (activeRow) => {
+      rows.forEach((row) => {
+        if (row === activeRow) {
+          gsap.to(row, { opacity: 1, duration: 0.25, overwrite: true })
+          gsap.to(row.querySelector('.tool-name'), { color: '#338bff', duration: 0.25, overwrite: true })
+          gsap.to(row.querySelector('.tool-arrow'), { x: 8, opacity: 1, duration: 0.25, ease: 'power2.out', overwrite: true })
+        } else {
+          gsap.to(row, { opacity: 0.08, duration: 0.25, overwrite: true })
+        }
+      })
+    }
+
+    const resetAll = () => {
+      rows.forEach((row) => {
+        gsap.to(row, { opacity: 1, duration: 0.35, overwrite: true })
+        gsap.to(row.querySelector('.tool-name'), { color: '#ffffff', duration: 0.35, overwrite: true })
+        gsap.to(row.querySelector('.tool-arrow'), { x: 0, opacity: 0, duration: 0.35, overwrite: true })
+      })
+    }
+
+    const onPointerOver = (e) => {
+      const row = e.target.closest('.tool-row')
+      if (row) focusRow(row)
+    }
+
+    const onPointerOut = (e) => {
+      if (!container.contains(e.relatedTarget)) resetAll()
+    }
+
+    container.addEventListener('pointerover', onPointerOver)
+    container.addEventListener('pointerout', onPointerOut)
+
+    return () => {
+      container.removeEventListener('pointerover', onPointerOver)
+      container.removeEventListener('pointerout', onPointerOut)
+    }
+  }, { scope: listRef })
 
   const categoryLabels = {
     color: '色彩',
@@ -103,8 +121,6 @@ export default function HomePage() {
             className="tool-row cursor-pointer border-b border-ink-faint"
             style={{ padding: '2vh 0' }}
             onClick={() => handleClick(tool.id)}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
           >
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-baseline gap-4 md:gap-8">
