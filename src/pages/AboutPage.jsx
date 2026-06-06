@@ -11,18 +11,18 @@ export default function AboutPage() {
   const pageRef = useRef(null)
 
   useGSAP(() => {
-    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out', duration: 0.35 } })
 
-    tl.from('.ap-back', { autoAlpha: 0, x: -10, duration: 0.5 })
-      .from('.ap-title', { autoAlpha: 0, y: 30, duration: 0.9 }, '-=0.3')
-      .from('.ap-rule', { scaleX: 0, transformOrigin: 'left center', duration: 0.8, ease: 'power2.inOut' }, '-=0.5')
-      .from('.ap-lead', { autoAlpha: 0, y: 20, duration: 0.7 }, '-=0.4')
+    tl.from('.ap-back', { autoAlpha: 0, x: -8 })
+      .from('.ap-title', { autoAlpha: 0, y: 24 }, '-=0.2')
+      .from('.ap-rule', { autoAlpha: 0, scaleX: 0, transformOrigin: 'left center', duration: 0.5, ease: 'power2.inOut' }, '-=0.2')
+      .from('.ap-lead', { autoAlpha: 0, y: 12 }, '-=0.2')
   }, { scope: pageRef })
 
-  // Principles ScrollTrigger Reveal
+  // Principles ScrollTrigger Reveal — smooth deceleration, no overshoot
   useGSAP(() => {
     const items = gsap.utils.toArray('.ap-item', pageRef.current)
-    items.forEach((item, i) => {
+    items.forEach((item) => {
       const numEl = item.querySelector('.dcde-caption')
       const titleEl = item.querySelector('h3')
       const descEl = item.querySelector('p')
@@ -33,27 +33,35 @@ export default function AboutPage() {
           start: 'top 85%',
           once: true,
         },
-        defaults: { ease: 'power3.out', duration: 0.7 },
+        defaults: { ease: 'power3.out', duration: 0.35 },
       })
 
       if (numEl) {
-        tl.from(numEl, { autoAlpha: 0, scale: 0, duration: 0.5, ease: 'back.out(1.5)' })
+        tl.from(numEl, { autoAlpha: 0, scale: 0.8 })
       }
       if (titleEl) {
-        tl.from(titleEl, { autoAlpha: 0, y: 30, skewX: -5 }, '-=0.3')
+        tl.from(titleEl, { autoAlpha: 0, y: 16 }, '-=0.2')
       }
       if (descEl) {
-        tl.from(descEl, { autoAlpha: 0, y: 20 }, '-=0.4')
+        tl.from(descEl, { autoAlpha: 0, y: 10 }, '-=0.2')
       }
     })
   }, { scope: pageRef })
 
   // Back button arrow shift
   const handleBackEnter = (e) => {
-    gsap.to(e.currentTarget.querySelector('.back-arrow'), { x: -4, duration: 0.25, ease: 'power2.out' })
+    gsap.to(e.currentTarget.querySelector('.back-arrow'), {
+      x: -4,
+      duration: 0.25,
+      ease: 'power3.out',
+    })
   }
   const handleBackLeave = (e) => {
-    gsap.to(e.currentTarget.querySelector('.back-arrow'), { x: 0, duration: 0.25, ease: 'power2.out' })
+    gsap.to(e.currentTarget.querySelector('.back-arrow'), {
+      x: 0,
+      duration: 0.25,
+      ease: 'power3.out',
+    })
   }
 
   return (

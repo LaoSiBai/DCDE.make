@@ -8,7 +8,7 @@ export default function PageTransition({ children }) {
   const prevPath = useRef(null)
   const isFirstRender = useRef(true)
 
-  // Entrance animation on every route change (skip first render)
+  // Apple Fluid Motion entrance on every route change (skip first render)
   useLayoutEffect(() => {
     const el = containerRef.current
     if (!el) return
@@ -25,28 +25,30 @@ export default function PageTransition({ children }) {
     const target = el.firstElementChild
     if (!target) return
 
-    // Kill any lingering GSAP tween (defensive)
+    // Interruptible: kill any ongoing tween, start from current state
     gsap.killTweensOf(target)
 
-    // Reset CSS animation classes
-    target.classList.remove('dcde-blur-fade-in', 'is-visible')
+    const reduced =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-    // Force reflow to allow re-triggering the animation
-    void target.offsetWidth
-
-    // Trigger CSS blur fade-in (0.35s, non-blocking — pointer-events remain active)
-    target.classList.add('dcde-blur-fade-in', 'is-visible')
-
-    // Cleanup animation class after completion (keep final state via forwards)
-    const onEnd = () => {
-      target.classList.remove('dcde-blur-fade-in')
-      target.removeEventListener('animationend', onEnd)
+    if (reduced) {
+      gsap.set(target, { autoAlpha: 1, x: 0 })
+      return
     }
-    target.addEventListener('animationend', onEnd)
 
-    return () => {
-      target.removeEventListener('animationend', onEnd)
-    }
+    // Apple Fluid Motion: fast start, ultra-smooth deceleration (power3.out)
+    gsap.fromTo(
+      target,
+      { autoAlpha: 0, x: 24 },
+      {
+        autoAlpha: 1,
+        x: 0,
+        duration: 0.35,
+        ease: 'power3.out',
+        clearProps: 'opacity,visibility,x',
+      }
+    )
   }, [location.pathname])
 
   return (

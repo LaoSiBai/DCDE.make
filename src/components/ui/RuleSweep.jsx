@@ -22,8 +22,8 @@ export default function RuleSweep() {
             { scaleX: 0 },
             {
               scaleX: 1,
-              duration: 0.4,
-              ease: 'power2.out',
+              duration: 0.35,
+              ease: 'power3.out',
               transformOrigin: `${entrySide} center`,
             }
           )
@@ -34,8 +34,8 @@ export default function RuleSweep() {
 
           gsap.to(rule, {
             scaleX: 0,
-            duration: 0.3,
-            ease: 'power2.in',
+            duration: 0.25,
+            ease: 'power3.in',
             transformOrigin: `${entrySide} center`,
           })
         }

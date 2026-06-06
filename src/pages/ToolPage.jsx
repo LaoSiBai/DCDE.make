@@ -13,17 +13,17 @@ export default function ToolPage() {
   const pageRef = useRef(null)
 
   useGSAP(() => {
-    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out', duration: 0.35 } })
 
-    tl.from('.tp-back', { autoAlpha: 0, x: -8, duration: 0.4 })
-      .from('.tp-title', { autoAlpha: 0, y: 40, duration: 0.9 }, '-=0.2')
-      .from('.tp-desc', { autoAlpha: 0, y: 15, duration: 0.5 }, '-=0.5')
-      .from('.tp-rule', { scaleX: 0, transformOrigin: 'left center', duration: 0.6, ease: 'power2.inOut' }, '-=0.3')
-      .from('.tp-sidebar', { autoAlpha: 0, x: -20, duration: 0.6 }, '-=0.3')
-      .from('.tp-canvas', { autoAlpha: 0, scale: 0.98, duration: 0.7 }, '-=0.4')
+    tl.from('.tp-back', { autoAlpha: 0, x: -8 })
+      .from('.tp-title', { autoAlpha: 0, y: 30 }, '-=0.2')
+      .from('.tp-desc', { autoAlpha: 0, y: 12 }, '-=0.2')
+      .from('.tp-rule', { autoAlpha: 0, scaleX: 0, transformOrigin: 'left center', duration: 0.5, ease: 'power2.inOut' }, '-=0.2')
+      .from('.tp-sidebar', { autoAlpha: 0, x: -16 }, '-=0.2')
+      .from('.tp-canvas', { autoAlpha: 0, scale: 0.98 }, '-=0.2')
   }, { scope: pageRef })
 
-  // Canvas Breath animation
+  // Canvas Breath animation — continuous, not entrance
   useGSAP(() => {
     const canvasContent = pageRef.current?.querySelector('.tp-canvas > div')
     if (canvasContent) {
@@ -39,10 +39,18 @@ export default function ToolPage() {
   }, { scope: pageRef })
 
   const handleBackEnter = (e) => {
-    gsap.to(e.currentTarget.querySelector('.back-arrow'), { x: -4, duration: 0.25, ease: 'power2.out' })
+    gsap.to(e.currentTarget.querySelector('.back-arrow'), {
+      x: -4,
+      duration: 0.25,
+      ease: 'power3.out',
+    })
   }
   const handleBackLeave = (e) => {
-    gsap.to(e.currentTarget.querySelector('.back-arrow'), { x: 0, duration: 0.25, ease: 'power2.out' })
+    gsap.to(e.currentTarget.querySelector('.back-arrow'), {
+      x: 0,
+      duration: 0.25,
+      ease: 'power3.out',
+    })
   }
 
   if (!tool) {

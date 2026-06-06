@@ -1,4 +1,4 @@
-import { useRef, useEffect, forwardRef } from 'react'
+import { useRef, forwardRef } from 'react'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 
@@ -15,8 +15,9 @@ const MagneticButton = forwardRef(function MagneticButton({ children, radius = 6
     const el = containerRef.current
     if (!el) return
 
-    xTo.current = gsap.quickTo(el, 'x', { duration: 0.4, ease: 'elastic.out(1, 0.4)' })
-    yTo.current = gsap.quickTo(el, 'y', { duration: 0.4, ease: 'elastic.out(1, 0.4)' })
+    // Apple Fluid Motion: smooth deceleration, no spring overshoot
+    xTo.current = gsap.quickTo(el, 'x', { duration: 0.4, ease: 'power3.out' })
+    yTo.current = gsap.quickTo(el, 'y', { duration: 0.4, ease: 'power3.out' })
 
     const onPointerMove = (e) => {
       if (!isHovering.current) return

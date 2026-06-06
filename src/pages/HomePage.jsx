@@ -9,14 +9,13 @@ export default function HomePage() {
   const listRef = useRef(null)
   const navigate = useNavigate()
 
-  // Unified elastic + opacity fade-in entrance (GPU-only, no reflow)
+  // Apple Fluid Motion entrance — smooth deceleration, no overshoot
   useGSAP(() => {
     const reduced =
       typeof window !== 'undefined' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
     const ctx = gsap.context(() => {
-      // Reduced motion: static direct render, zero animation
       if (reduced) {
         gsap.set('.hm-logo-svg, .hm-sub, .hm-rule, .tool-row', {
           autoAlpha: 1,
@@ -27,17 +26,12 @@ export default function HomePage() {
         return
       }
 
-      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
+      const tl = gsap.timeline({ defaults: { ease: 'power3.out', duration: 0.35 } })
 
-      // Logo: elastic scale + opacity
-      tl.from('.hm-logo-svg', {
-        autoAlpha: 0,
-        scale: 0.85,
-        duration: 0.8,
-        ease: 'back.out(1.7)',
-      })
+      // Logo: scale + opacity, smooth landing (no spring overshoot)
+      tl.from('.hm-logo-svg', { autoAlpha: 0, scale: 0.92 })
 
-      // Title char-by-char: elastic y + rotateX + opacity
+      // Title char-by-char: y + rotateX + opacity
       const titleEl = listRef.current?.querySelector('.hm-title')
       if (titleEl) {
         const text = titleEl.textContent
@@ -66,56 +60,36 @@ export default function HomePage() {
             chars.push(span)
           }
         }
-        tl.from(
-          chars,
-          {
-            autoAlpha: 0,
-            y: 20,
-            rotateX: -60,
-            duration: 0.6,
-            stagger: 0.02,
-            ease: 'back.out(1.5)',
-          },
-          '-=0.5'
-        )
+        tl.from(chars, {
+          autoAlpha: 0,
+          y: 16,
+          rotateX: -40,
+          stagger: 0.03,
+        }, '-=0.2')
       }
 
-      // Subtitle: elastic y + opacity
-      tl.from(
-        '.hm-sub',
-        { autoAlpha: 0, y: 15, duration: 0.7, ease: 'back.out(1.2)' },
-        '-=0.5'
-      )
+      // Subtitle
+      tl.from('.hm-sub', { autoAlpha: 0, y: 12 }, '-=0.2')
 
-      // Divider: scaleX + opacity
-      tl.from(
-        '.hm-rule',
-        {
-          autoAlpha: 0,
-          scaleX: 0,
-          transformOrigin: 'left center',
-          duration: 0.8,
-          ease: 'power2.inOut',
-        },
-        '-=0.4'
-      )
+      // Divider
+      tl.from('.hm-rule', {
+        autoAlpha: 0,
+        scaleX: 0,
+        transformOrigin: 'left center',
+        duration: 0.5,
+        ease: 'power2.inOut',
+      }, '-=0.2')
 
-      // Tool rows: elastic y + opacity
-      tl.from(
-        '.tool-row',
-        {
-          autoAlpha: 0,
-          y: 20,
-          duration: 0.7,
-          stagger: 0.06,
-          ease: 'back.out(1.4)',
-        },
-        '-=0.5'
-      )
+      // Tool rows: staggered reveal
+      tl.from('.tool-row', {
+        autoAlpha: 0,
+        y: 14,
+        stagger: 0.04,
+      }, '-=0.3')
     }, listRef)
   }, { scope: listRef })
 
-  // Hover effect — each row independent, no cross-row animation
+  // Hover effect — each row independent, interruptible quickTo
   useGSAP(() => {
     const container = listRef.current
     if (!container) return
@@ -123,10 +97,10 @@ export default function HomePage() {
     const rows = gsap.utils.toArray('.tool-row', container)
 
     const qt = rows.map((row) => ({
-      rowX: gsap.quickTo(row, 'x', { duration: 0.25, ease: 'power2.out' }),
+      rowX: gsap.quickTo(row, 'x', { duration: 0.25, ease: 'power3.out' }),
       arrowX: gsap.quickTo(row.querySelector('.tool-arrow'), 'x', {
         duration: 0.25,
-        ease: 'power2.out',
+        ease: 'power3.out',
       }),
       arrowOpacity: gsap.quickTo(row.querySelector('.tool-arrow'), 'autoAlpha', {
         duration: 0.25,
