@@ -25,39 +25,28 @@ export default function PageTransition({ children }) {
     const target = el.firstElementChild
     if (!target) return
 
-    // Interruptible: kill any ongoing tween, do NOT clearProps:all
-    // (would wipe JSX inline styles like padding/margin set on the page root)
+    // Kill any lingering GSAP tween (defensive)
     gsap.killTweensOf(target)
 
-    const reduced =
-      typeof window !== 'undefined' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    // Reset CSS animation classes
+    target.classList.remove('dcde-blur-fade-in', 'is-visible')
 
-    const ctx = gsap.context(() => {
-      if (reduced) {
-        // Reduced motion: only opacity, no spatial transform
-        gsap.fromTo(
-          target,
-          { autoAlpha: 0 },
-          { autoAlpha: 1, duration: 0.2, ease: 'power2.out' }
-        )
-      } else {
-        // High-performance: translateX + opacity only (GPU-accelerated)
-        gsap.fromTo(
-          target,
-          { autoAlpha: 0, x: 24 },
-          {
-            autoAlpha: 1,
-            x: 0,
-            duration: 0.5,
-            ease: 'power3.out',
-            clearProps: 'opacity,visibility,x',
-          }
-        )
-      }
-    }, el)
+    // Force reflow to allow re-triggering the animation
+    void target.offsetWidth
 
-    return () => ctx.revert()
+    // Trigger CSS blur fade-in
+    target.classList.add('dcde-blur-fade-in', 'is-visible')
+
+    // Cleanup animation class after completion (keep final state via forwards)
+    const onEnd = () => {
+      target.classList.remove('dcde-blur-fade-in')
+      target.removeEventListener('animationend', onEnd)
+    }
+    target.addEventListener('animationend', onEnd)
+
+    return () => {
+      target.removeEventListener('animationend', onEnd)
+    }
   }, [location.pathname])
 
   return (

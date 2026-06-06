@@ -1,62 +1,42 @@
-import { useRef } from 'react'
+import { useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { useGSAP } from '@gsap/react'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-
-gsap.registerPlugin(ScrollTrigger)
 
 export default function Footer() {
   const footerRef = useRef(null)
 
-  useGSAP(() => {
+  useEffect(() => {
     const el = footerRef.current
     if (!el) return
 
-    const reduced =
-      typeof window !== 'undefined' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-
-    if (reduced) {
-      gsap.set(el, { autoAlpha: 1, y: 0, filter: 'none', willChange: 'auto' })
-      return
-    }
-
-    gsap.set(el, { willChange: 'filter, opacity, transform' })
-
-    gsap.fromTo(
-      el,
-      { autoAlpha: 0, y: 30, filter: 'blur(16px)' },
-      {
-        autoAlpha: 1,
-        y: 0,
-        filter: 'blur(0px)',
-        duration: 1.2,
-        ease: 'power2.out',
-        scrollTrigger: {
-          trigger: el,
-          start: 'top 95%',
-          once: true,
-        },
-        onComplete: () => {
-          gsap.set(el, { clearProps: 'willChange,filter' })
-        },
-      }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible')
+            observer.unobserve(entry.target)
+          }
+        })
+      },
+      { threshold: 0.1 }
     )
-  }, { scope: footerRef })
+
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
 
   return (
-    <footer ref={footerRef} style={{ padding: '0 var(--spacing-page)' }}>
+    <footer
+      ref={footerRef}
+      className="dcde-blur-fade-in"
+      style={{ padding: '0 var(--spacing-page)' }}
+    >
       <div className="dcde-rule-solid mb-6" />
       <div className="flex items-center justify-between py-6">
-        <p className="dcde-caption text-ink-faint">
+        <span className="dcde-footer-link">
           © {new Date().getFullYear()} DCDE
-        </p>
+        </span>
 
-        <Link
-          to="/about"
-          className="dcde-nav py-2 px-4"
-        >
+        <Link to="/about" className="dcde-footer-link">
           关于
         </Link>
 
@@ -64,10 +44,9 @@ export default function Footer() {
           href="https://dcde.club"
           target="_blank"
           rel="noopener noreferrer"
-          className="dcde-caption text-ink-dim hover:text-ink transition-colors relative group"
+          className="dcde-footer-link"
         >
           dcde.club
-          <span className="absolute bottom-0 left-0 w-0 h-px bg-ink group-hover:w-full transition-all duration-300" />
         </a>
       </div>
     </footer>

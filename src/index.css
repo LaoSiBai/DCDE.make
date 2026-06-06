@@ -203,11 +203,6 @@
     white-space: nowrap;
   }
 
-  .dcde-nav:hover {
-    color: var(--color-ink);
-    opacity: 0.7;
-  }
-
   .dcde-nav:active {
     transform: translateY(1px) scale(0.97);
     opacity: 0.5;
@@ -251,5 +246,83 @@
     font-weight: 600;
     color: var(--color-ink-faint);
     letter-spacing: 0.05em;
+  }
+
+  /* ==========================================================================
+     Global Animations — GPU-only, no reflow
+     ========================================================================== */
+
+  @keyframes blurFadeIn {
+    from {
+      opacity: 0;
+      filter: blur(12px);
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      filter: blur(0px);
+      transform: translateY(0);
+    }
+  }
+
+  .dcde-blur-fade-in {
+    opacity: 0;
+    filter: blur(12px);
+    transform: translateY(20px);
+    will-change: filter, opacity, transform;
+  }
+
+  .dcde-blur-fade-in.is-visible {
+    animation: blurFadeIn 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  /* Footer link — unified with nav hover behavior */
+  .dcde-footer-link {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--font-family-body);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-ink-dim);
+    padding: 8px 0;
+    white-space: nowrap;
+    border: none;
+    background: none;
+    text-decoration: none;
+    transition: color 0.2s ease, transform 0.15s ease;
+  }
+
+  /* Hover only on pointer devices */
+  @media (hover: hover) and (pointer: fine) {
+    .dcde-footer-link:hover {
+      color: var(--color-ink);
+    }
+
+    .dcde-nav:hover {
+      color: var(--color-ink);
+      opacity: 0.7;
+    }
+  }
+
+  .dcde-footer-link:active {
+    transform: scale(0.96);
+    opacity: 0.5;
+  }
+}
+
+/* ==========================================================================
+   Accessibility — prefers-reduced-motion
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .dcde-blur-fade-in,
+  .dcde-blur-fade-in.is-visible {
+    opacity: 1 !important;
+    filter: none !important;
+    transform: none !important;
+    animation: none !important;
+    will-change: auto !important;
   }
 }
