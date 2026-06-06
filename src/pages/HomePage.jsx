@@ -3,11 +3,10 @@ import { useNavigate } from 'react-router-dom'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { SplitText } from 'gsap/SplitText'
 import { tools } from '../data/tools.registry.js'
 import Logo from '../components/ui/Logo.jsx'
 
-gsap.registerPlugin(ScrollTrigger, SplitText)
+gsap.registerPlugin(ScrollTrigger)
 
 export default function HomePage() {
   const listRef = useRef(null)
@@ -20,10 +19,36 @@ export default function HomePage() {
 
       tl.from('.hm-logo-svg', { autoAlpha: 0, scale: 0.9, duration: 0.8 })
 
-      const titleEl = document.querySelector('.hm-title')
+      // Title char-by-char animation (manual split, no premium plugin)
+      const titleEl = listRef.current?.querySelector('.hm-title')
       if (titleEl) {
-        const split = SplitText.create(titleEl, { type: 'chars', charsClass: 'hm-title-char' })
-        tl.from(split.chars, {
+        const text = titleEl.textContent
+        titleEl.innerHTML = ''
+        const chars = []
+        for (const ch of text) {
+          if (ch === ' ') {
+            const space = document.createElement('span')
+            space.innerHTML = '&nbsp;'
+            space.style.display = 'inline-block'
+            space.style.width = '0.3em'
+            titleEl.appendChild(space)
+            chars.push(space)
+          } else if (ch === '·') {
+            const dot = document.createElement('span')
+            dot.textContent = '·'
+            dot.className = 'text-accent'
+            dot.style.display = 'inline-block'
+            titleEl.appendChild(dot)
+            chars.push(dot)
+          } else {
+            const span = document.createElement('span')
+            span.textContent = ch
+            span.style.display = 'inline-block'
+            titleEl.appendChild(span)
+            chars.push(span)
+          }
+        }
+        tl.from(chars, {
           autoAlpha: 0,
           y: 30,
           rotateX: -90,
@@ -31,8 +56,6 @@ export default function HomePage() {
           stagger: 0.02,
           ease: 'back.out(1.5)',
         }, '-=0.5')
-      } else {
-        tl.from('.hm-title', { autoAlpha: 0, y: 40, duration: 1 }, '-=0.5')
       }
 
       tl.from('.hm-sub', { autoAlpha: 0, y: 20, duration: 0.7 }, '-=0.6')
