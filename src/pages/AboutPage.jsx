@@ -35,11 +35,11 @@ export default function AboutPage() {
       <div className="pt-20 pb-12">
         <Link
           to="/"
-          className="ap-back dcde-tag dcde-tag-muted mb-8"
+          className="ap-back dcde-nav mb-8"
           onMouseEnter={handleBackEnter}
           onMouseLeave={handleBackLeave}
         >
-          <ArrowLeft className="back-arrow w-3 h-3" />
+          <ArrowLeft className="back-arrow w-4 h-4" />
           返回
         </Link>
         <h1 className="ap-title dcde-mega text-ink mt-4">关于</h1>
@@ -61,7 +61,7 @@ export default function AboutPage() {
             { num: '04', title: '开放透明', desc: '开源、可审查、可扩展' },
           ].map((item) => (
             <div key={item.title} className="ap-item flex items-start gap-4">
-              <span className="dcde-tag dcde-tag-accent mt-0.5">{item.num}</span>
+              <span className="dcde-caption text-ink-faint mt-0.5 select-none">{item.num}</span>
               <div>
                 <h3 className="dcde-lg text-ink mb-1">{item.title}</h3>
                 <p className="dcde-body text-ink-dim">{item.desc}</p>

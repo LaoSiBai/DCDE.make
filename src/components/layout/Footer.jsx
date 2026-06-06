@@ -33,7 +33,7 @@ export default function Footer() {
           href="https://dcde.club"
           target="_blank"
           rel="noopener noreferrer"
-          className="dcde-caption text-ink-faint hover:text-accent transition-colors relative group"
+          className="dcde-caption text-ink-dim hover:text-accent transition-colors relative group"
         >
           dcde.club
           <span className="absolute bottom-0 left-0 w-0 h-px bg-accent group-hover:w-full transition-all duration-300" />

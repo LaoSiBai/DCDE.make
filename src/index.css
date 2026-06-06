@@ -4,6 +4,7 @@
 
 /* ==========================================================================
    DCDE·make — Bold & Controlled Design System
+   5-tier visual hierarchy: Primary / Active / Inactive / Nav / Badge
    Dark canvas, single accent, extreme scale, absolute minimalism
    ========================================================================== */
 
@@ -97,7 +98,12 @@
     text-transform: uppercase;
   }
 
-  /* The one button */
+  /* ==========================================================================
+     5-Tier Component System
+     Each tier has ONE job. No overloaded styles.
+     ========================================================================== */
+
+  /* Tier 1 — Primary: the ONE main action per view */
   .dcde-pill {
     display: inline-flex;
     align-items: center;
@@ -112,7 +118,7 @@
     border-radius: 9999px;
     cursor: pointer;
     border: none;
-    transition: transform 0.2s ease, background-color 0.2s ease;
+    transition: transform 0.15s ease, background-color 0.2s ease;
     white-space: nowrap;
   }
 
@@ -121,25 +127,105 @@
     transform: translateY(-2px);
   }
 
-  /* Ghost button */
-  .dcde-ghost {
+  .dcde-pill:active {
+    transform: translateY(0) scale(0.97);
+  }
+
+  /* Tier 2 — Active: selected state, small capsule */
+  .dcde-tag-accent {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background-color: var(--color-accent);
+    color: var(--color-void);
+    font-family: var(--font-family-body);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 8px 18px;
+    border-radius: 9999px;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .dcde-tag-accent:hover {
+    background-color: var(--color-accent-active);
+  }
+
+  .dcde-tag-accent:active {
+    transform: scale(0.96);
+  }
+
+  /* Tier 3 — Inactive: unselected toggle, paired with Active */
+  .dcde-tag-muted {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--color-ink);
+    font-family: var(--font-family-body);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 8px 18px;
+    border-radius: 9999px;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .dcde-tag-muted:hover {
+    background-color: rgba(255, 255, 255, 0.18);
+  }
+
+  .dcde-tag-muted:active {
+    transform: scale(0.96);
+  }
+
+  /* Tier 4 — Nav: navigation links, large hit area, no background */
+  .dcde-nav {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    color: var(--color-ink);
     font-family: var(--font-family-body);
     font-size: 14px;
-    font-weight: 600;
-    padding: 12px 0;
+    font-weight: 700;
+    color: var(--color-ink);
+    padding: 14px 24px;
+    border-radius: 9999px;
     cursor: pointer;
     border: none;
     background: none;
-    transition: color 0.2s ease;
+    transition: color 0.2s ease, transform 0.15s ease;
     white-space: nowrap;
   }
 
-  .dcde-ghost:hover {
+  .dcde-nav:hover {
     color: var(--color-accent);
+  }
+
+  .dcde-nav:active {
+    transform: translateY(1px) scale(0.97);
+    color: var(--color-accent-active);
+  }
+
+  /* Tier 5 — Badge: pure information, NEVER interactive */
+  .dcde-badge {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--font-family-body);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-ink-faint);
+    padding: 8px 0;
+    white-space: nowrap;
+    user-select: none;
+    pointer-events: none;
   }
 
   /* Divider */
@@ -155,56 +241,6 @@
     background-color: var(--color-ink-faint);
     border: none;
     margin: 0;
-  }
-
-  .dcde-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    font-family: var(--font-family-body);
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    padding: 8px 18px;
-    border-radius: 9999px;
-    white-space: nowrap;
-    cursor: pointer;
-    transition: all 0.2s ease;
-  }
-
-  .dcde-tag-accent {
-    background-color: var(--color-accent);
-    color: var(--color-void);
-  }
-
-  .dcde-tag-ink {
-    background-color: var(--color-ink);
-    color: var(--color-void);
-  }
-
-  .dcde-tag-ink:hover {
-    background-color: rgba(255, 255, 255, 0.85);
-  }
-
-  .dcde-tag-muted {
-    background-color: rgba(255, 255, 255, 0.1);
-    color: var(--color-ink);
-  }
-
-  .dcde-tag-muted:hover {
-    background-color: rgba(255, 255, 255, 0.18);
-  }
-
-  .dcde-tag-ghost {
-    background-color: transparent;
-    color: var(--color-ink-dim);
-    border: 2px solid var(--color-ink-faint);
-  }
-
-  .dcde-tag-ghost:hover {
-    color: var(--color-ink);
-    border-color: var(--color-ink-dim);
   }
 
   /* Index number */
