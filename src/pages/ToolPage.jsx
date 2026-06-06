@@ -15,13 +15,12 @@ export default function ToolPage() {
   useGSAP(() => {
     const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
 
-    tl.from('.tp-back', { autoAlpha: 0, y: -8, duration: 0.4 })
-      .from('.tp-title', { autoAlpha: 0, y: 50, duration: 1 }, '-=0.2')
-      .from('.tp-desc', { autoAlpha: 0, y: 20, duration: 0.6 }, '-=0.6')
-      .from('.tp-meta', { autoAlpha: 0, y: 15, duration: 0.5 }, '-=0.4')
-      .from('.tp-rule', { scaleX: 0, transformOrigin: 'left center', duration: 0.8, ease: 'power2.inOut' }, '-=0.4')
-      .from('.tp-param', { autoAlpha: 0, y: 20, duration: 0.5, stagger: 0.06 }, '-=0.5')
-      .from('.tp-canvas', { autoAlpha: 0, scale: 0.97, duration: 0.8, ease: 'power2.out' }, '-=0.4')
+    tl.from('.tp-back', { autoAlpha: 0, x: -8, duration: 0.4 })
+      .from('.tp-title', { autoAlpha: 0, y: 40, duration: 0.9 }, '-=0.2')
+      .from('.tp-desc', { autoAlpha: 0, y: 15, duration: 0.5 }, '-=0.5')
+      .from('.tp-rule', { scaleX: 0, transformOrigin: 'left center', duration: 0.6, ease: 'power2.inOut' }, '-=0.3')
+      .from('.tp-sidebar', { autoAlpha: 0, x: -20, duration: 0.6 }, '-=0.3')
+      .from('.tp-canvas', { autoAlpha: 0, scale: 0.98, duration: 0.7 }, '-=0.4')
   }, { scope: pageRef })
 
   const handleBackEnter = (e) => {
@@ -58,56 +57,61 @@ export default function ToolPage() {
         </Link>
 
         <h1 className="tp-title dcde-mega text-ink mt-6">{tool.name}</h1>
-        <p className="tp-desc dcde-body text-ink-dim mt-3 max-w-xl">{tool.description}</p>
-
-        <div className="tp-meta flex items-center gap-3 mt-4">
-          <span className="dcde-tag dcde-tag-accent">{categoryLabels[tool.category]}</span>
-          <span className="dcde-caption text-ink-faint">{tool.nameEn}</span>
-        </div>
+        <p className="tp-desc dcde-body text-ink-dim mt-3">{tool.description}</p>
       </div>
 
       <div className="tp-rule dcde-rule-solid" />
 
-      {/* Params Bar */}
-      <div className="py-6 flex flex-wrap items-center gap-4">
-        <div className="tp-param flex items-center gap-2">
-          <label className="dcde-caption text-ink-faint">输入</label>
-          <input
-            type="text"
-            placeholder="输入值..."
-            disabled
-            className="bg-void text-ink border border-ink-faint rounded-full px-5 py-3 text-sm outline-none focus:border-accent transition-colors min-w-[200px]"
-          />
-        </div>
+      {/* Main: sidebar + canvas */}
+      <div className="flex-1 flex gap-6 pt-6 pb-24 lg:pb-12" style={{ minHeight: 0 }}>
+        {/* Sidebar */}
+        <aside className="tp-sidebar w-64 flex-shrink-0 hidden lg:flex flex-col gap-6">
+          <div>
+            <div className="flex items-center gap-2 mb-5">
+              <span className="dcde-tag dcde-tag-ghost">{categoryLabels[tool.category]}</span>
+              <span className="dcde-caption text-ink-faint">{tool.nameEn}</span>
+            </div>
 
-        <div className="tp-param flex items-center gap-2">
-          <label className="dcde-caption text-ink-faint">模式</label>
-          <button className="dcde-tag dcde-tag-accent">A</button>
-          <button className="dcde-tag dcde-tag-ghost">B</button>
-        </div>
+            <div className="space-y-5">
+              <div>
+                <label className="dcde-caption text-ink-faint block mb-2">输入</label>
+                <input
+                  type="text"
+                  placeholder="输入值..."
+                  disabled
+                  className="w-full bg-transparent text-ink border-b border-ink-faint py-3 text-sm outline-none focus:border-ink transition-colors placeholder:text-ink-faint/50"
+                />
+              </div>
 
-        <div className="tp-param flex items-center gap-3 flex-1 min-w-[180px]">
-          <label className="dcde-caption text-ink-faint flex-shrink-0">强度</label>
-          <div className="h-1.5 flex-1 bg-ink-faint rounded-full overflow-hidden">
-            <div className="h-full w-2/3 bg-accent rounded-full" />
+              <div>
+                <label className="dcde-caption text-ink-faint block mb-3">模式</label>
+                <div className="flex gap-2">
+                  <button className="dcde-tag dcde-tag-ghost border-ink-dim text-ink">A</button>
+                  <button className="dcde-tag dcde-tag-ghost">B</button>
+                </div>
+              </div>
+
+              <div>
+                <label className="dcde-caption text-ink-faint block mb-3">强度</label>
+                <div className="h-px w-full bg-ink-faint rounded-full relative">
+                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-ink border-2 border-void" style={{ left: '66%' }} />
+                </div>
+                <div className="flex justify-between mt-2">
+                  <span className="text-[11px] text-ink-faint">0</span>
+                  <span className="text-[11px] text-ink-faint">100</span>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
 
-        <div className="tp-param ml-auto">
-          <button className="dcde-pill">
-            应用
-          </button>
-        </div>
-      </div>
+          <div className="mt-auto">
+            <div className="dcde-rule-solid" />
+            <button className="dcde-pill w-full justify-center mt-5">应用</button>
+          </div>
+        </aside>
 
-      <div className="tp-rule dcde-rule-solid" />
-
-      {/* Full-width Canvas */}
-      <div className="flex-1 py-6">
-        <div
-          className="tp-canvas bg-void-raised rounded-3xl flex items-center justify-center"
-          style={{ minHeight: '50vh', border: '1px solid rgba(255,255,255,0.06)' }}
-        >
+        {/* Canvas */}
+        <div className="tp-canvas flex-1 flex items-center justify-center rounded-3xl bg-void-raised" style={{ border: '1px solid rgba(255,255,255,0.06)' }}>
           <div className="flex flex-col items-center gap-5">
             <span className="dcde-tag dcde-tag-ghost">Coming Soon</span>
             <p className="dcde-lg text-ink">工具开发中</p>
@@ -115,9 +119,6 @@ export default function ToolPage() {
           </div>
         </div>
       </div>
-
-      {/* Bottom spacer */}
-      <div className="h-12" />
     </div>
   )
 }
