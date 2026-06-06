@@ -23,6 +23,21 @@ export default function ToolPage() {
       .from('.tp-canvas', { autoAlpha: 0, scale: 0.98, duration: 0.7 }, '-=0.4')
   }, { scope: pageRef })
 
+  // Canvas Breath animation
+  useGSAP(() => {
+    const canvasContent = pageRef.current?.querySelector('.tp-canvas > div')
+    if (canvasContent) {
+      gsap.to(canvasContent, {
+        scale: 0.985,
+        autoAlpha: 0.9,
+        duration: 3,
+        ease: 'sine.inOut',
+        yoyo: true,
+        repeat: -1,
+      })
+    }
+  }, { scope: pageRef })
+
   const handleBackEnter = (e) => {
     gsap.to(e.currentTarget.querySelector('.back-arrow'), { x: -4, duration: 0.25, ease: 'power2.out' })
   }

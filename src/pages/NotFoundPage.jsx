@@ -9,8 +9,23 @@ export default function NotFoundPage() {
 
   useGSAP(() => {
     const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
-    tl.from('.nf-code', { autoAlpha: 0, y: 30, scale: 0.95, duration: 0.8 })
-      .from('.nf-title', { autoAlpha: 0, y: 20, duration: 0.7 }, '-=0.5')
+
+    // 404 Counter
+    const codeEl = pageRef.current?.querySelector('.nf-code')
+    if (codeEl) {
+      const counter = { val: 0 }
+      tl.to(counter, {
+        val: 404,
+        duration: 1.2,
+        ease: 'power2.out',
+        snap: { val: 1 },
+        onUpdate: () => {
+          codeEl.innerText = String(Math.round(counter.val)).padStart(3, '0')
+        },
+      })
+    }
+
+    tl.from('.nf-title', { autoAlpha: 0, y: 20, duration: 0.7 }, '-=0.5')
       .from('.nf-btn', { autoAlpha: 0, y: 15, duration: 0.5 }, '-=0.4')
   }, { scope: pageRef })
 

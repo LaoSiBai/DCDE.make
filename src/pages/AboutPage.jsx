@@ -2,7 +2,10 @@ import { useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { ArrowLeft } from 'lucide-react'
+
+gsap.registerPlugin(ScrollTrigger)
 
 export default function AboutPage() {
   const pageRef = useRef(null)
@@ -14,12 +17,35 @@ export default function AboutPage() {
       .from('.ap-title', { autoAlpha: 0, y: 30, duration: 0.9 }, '-=0.3')
       .from('.ap-rule', { scaleX: 0, transformOrigin: 'left center', duration: 0.8, ease: 'power2.inOut' }, '-=0.5')
       .from('.ap-lead', { autoAlpha: 0, y: 20, duration: 0.7 }, '-=0.4')
-      .from('.ap-item', {
-        autoAlpha: 0,
-        y: 20,
-        duration: 0.6,
-        stagger: 0.1,
-      }, '-=0.3')
+  }, { scope: pageRef })
+
+  // Principles ScrollTrigger Reveal
+  useGSAP(() => {
+    const items = gsap.utils.toArray('.ap-item', pageRef.current)
+    items.forEach((item, i) => {
+      const numEl = item.querySelector('.dcde-caption')
+      const titleEl = item.querySelector('h3')
+      const descEl = item.querySelector('p')
+
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: item,
+          start: 'top 85%',
+          once: true,
+        },
+        defaults: { ease: 'power3.out', duration: 0.7 },
+      })
+
+      if (numEl) {
+        tl.from(numEl, { autoAlpha: 0, scale: 0, duration: 0.5, ease: 'back.out(1.5)' })
+      }
+      if (titleEl) {
+        tl.from(titleEl, { autoAlpha: 0, y: 30, skewX: -5 }, '-=0.3')
+      }
+      if (descEl) {
+        tl.from(descEl, { autoAlpha: 0, y: 20 }, '-=0.4')
+      }
+    })
   }, { scope: pageRef })
 
   // Back button arrow shift

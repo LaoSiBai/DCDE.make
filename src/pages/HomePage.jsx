@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { SplitText } from 'gsap/SplitText'
 import { tools } from '../data/tools.registry.js'
 import Logo from '../components/ui/Logo.jsx'
 
-gsap.registerPlugin(ScrollTrigger)
+gsap.registerPlugin(ScrollTrigger, SplitText)
 
 export default function HomePage() {
   const listRef = useRef(null)
@@ -14,18 +15,50 @@ export default function HomePage() {
 
   // Entrance animation
   useGSAP(() => {
-    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
 
-    tl.from('.hm-logo-svg', { autoAlpha: 0, scale: 0.9, duration: 0.8 })
-      .from('.hm-title', { autoAlpha: 0, y: 40, duration: 1 }, '-=0.5')
-      .from('.hm-sub', { autoAlpha: 0, y: 20, duration: 0.7 }, '-=0.6')
-      .from('.hm-rule', { scaleX: 0, transformOrigin: 'left center', duration: 0.8, ease: 'power2.inOut' }, '-=0.4')
-      .from('.tool-row', {
-        autoAlpha: 0,
-        y: 30,
-        duration: 0.7,
-        stagger: 0.06,
-      }, '-=0.5')
+      tl.from('.hm-logo-svg', { autoAlpha: 0, scale: 0.9, duration: 0.8 })
+
+      const titleEl = document.querySelector('.hm-title')
+      if (titleEl) {
+        const split = SplitText.create(titleEl, { type: 'chars', charsClass: 'hm-title-char' })
+        tl.from(split.chars, {
+          autoAlpha: 0,
+          y: 30,
+          rotateX: -90,
+          duration: 0.6,
+          stagger: 0.02,
+          ease: 'back.out(1.5)',
+        }, '-=0.5')
+      } else {
+        tl.from('.hm-title', { autoAlpha: 0, y: 40, duration: 1 }, '-=0.5')
+      }
+
+      tl.from('.hm-sub', { autoAlpha: 0, y: 20, duration: 0.7 }, '-=0.6')
+        .from('.hm-rule', { scaleX: 0, transformOrigin: 'left center', duration: 0.8, ease: 'power2.inOut' }, '-=0.4')
+        .from('.tool-row', {
+          autoAlpha: 0,
+          y: 30,
+          skewY: 3,
+          duration: 0.7,
+          stagger: 0.06,
+        }, '-=0.5')
+    }, listRef)
+  }, { scope: listRef })
+
+  // Parallax Brand Moment
+  useGSAP(() => {
+    gsap.to('.brand-moment', {
+      yPercent: -20,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '.brand-moment',
+        start: 'top top',
+        end: 'bottom top',
+        scrub: 0.5,
+      },
+    })
   }, { scope: listRef })
 
   // Hover effect — each row independent, no cross-row animation

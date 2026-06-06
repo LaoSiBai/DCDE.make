@@ -7,6 +7,9 @@ import HomePage from './pages/HomePage.jsx'
 import ToolPage from './pages/ToolPage.jsx'
 import AboutPage from './pages/AboutPage.jsx'
 import NotFoundPage from './pages/NotFoundPage.jsx'
+import Cursor from './components/ui/Cursor.jsx'
+import ScrollProgress from './components/ui/ScrollProgress.jsx'
+import RuleSweep from './components/ui/RuleSweep.jsx'
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -19,6 +22,9 @@ function ScrollToTop() {
 function App() {
   return (
     <div className="min-h-[100dvh] bg-void text-ink">
+      <Cursor />
+      <ScrollProgress />
+      <RuleSweep />
       <ScrollToTop />
       <SiteHeader />
       <main>
