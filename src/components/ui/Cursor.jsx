@@ -72,8 +72,8 @@ export default function Cursor() {
         el.removeEventListener('mouseenter', onHoverStart)
         el.removeEventListener('mouseleave', onHoverEnd)
       })
-      xTo.current?.kill()
-      yTo.current?.kill()
+      xTo.current = null
+      yTo.current = null
       gsap.killTweensOf(el)
       gsap.killTweensOf(scale)
     }
