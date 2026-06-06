@@ -269,11 +269,11 @@
     opacity: 0;
     filter: blur(12px);
     transform: translateY(20px);
-    will-change: filter, opacity, transform;
+    will-change: filter, opacity;
   }
 
   .dcde-blur-fade-in.is-visible {
-    animation: blurFadeIn 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: blurFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 
   /* Footer link — unified with nav hover behavior */

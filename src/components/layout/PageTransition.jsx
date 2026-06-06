@@ -34,7 +34,7 @@ export default function PageTransition({ children }) {
     // Force reflow to allow re-triggering the animation
     void target.offsetWidth
 
-    // Trigger CSS blur fade-in
+    // Trigger CSS blur fade-in (0.35s, non-blocking — pointer-events remain active)
     target.classList.add('dcde-blur-fade-in', 'is-visible')
 
     // Cleanup animation class after completion (keep final state via forwards)
