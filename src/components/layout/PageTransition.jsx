@@ -25,9 +25,9 @@ export default function PageTransition({ children }) {
     const target = el.firstElementChild
     if (!target) return
 
-    // Interruptible: kill any ongoing tween and clear inline props
+    // Interruptible: kill any ongoing tween, do NOT clearProps:all
+    // (would wipe JSX inline styles like padding/margin set on the page root)
     gsap.killTweensOf(target)
-    gsap.set(target, { clearProps: 'all' })
 
     const reduced =
       typeof window !== 'undefined' &&
