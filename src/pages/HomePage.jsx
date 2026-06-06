@@ -2,24 +2,42 @@ import { useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { tools } from '../data/tools.registry.js'
 import Logo from '../components/ui/Logo.jsx'
-
-gsap.registerPlugin(ScrollTrigger)
 
 export default function HomePage() {
   const listRef = useRef(null)
   const navigate = useNavigate()
 
-  // Entrance animation
+  // Unified elastic + opacity fade-in entrance (GPU-only, no reflow)
   useGSAP(() => {
+    const reduced =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
     const ctx = gsap.context(() => {
+      // Reduced motion: static direct render, zero animation
+      if (reduced) {
+        gsap.set('.hm-logo-svg, .hm-sub, .hm-rule, .tool-row', {
+          autoAlpha: 1,
+          x: 0,
+          y: 0,
+          scale: 1,
+        })
+        return
+      }
+
       const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
 
-      tl.from('.hm-logo-svg', { autoAlpha: 0, scale: 0.9, duration: 0.8 })
+      // Logo: elastic scale + opacity
+      tl.from('.hm-logo-svg', {
+        autoAlpha: 0,
+        scale: 0.85,
+        duration: 0.8,
+        ease: 'back.out(1.7)',
+      })
 
-      // Title char-by-char animation (manual split, no premium plugin)
+      // Title char-by-char: elastic y + rotateX + opacity
       const titleEl = listRef.current?.querySelector('.hm-title')
       if (titleEl) {
         const text = titleEl.textContent
@@ -48,40 +66,53 @@ export default function HomePage() {
             chars.push(span)
           }
         }
-        tl.from(chars, {
-          autoAlpha: 0,
-          y: 30,
-          rotateX: -90,
-          duration: 0.6,
-          stagger: 0.02,
-          ease: 'back.out(1.5)',
-        }, '-=0.5')
+        tl.from(
+          chars,
+          {
+            autoAlpha: 0,
+            y: 20,
+            rotateX: -60,
+            duration: 0.6,
+            stagger: 0.02,
+            ease: 'back.out(1.5)',
+          },
+          '-=0.5'
+        )
       }
 
-      tl.from('.hm-sub', { autoAlpha: 0, y: 20, duration: 0.7 }, '-=0.6')
-        .from('.hm-rule', { scaleX: 0, transformOrigin: 'left center', duration: 0.8, ease: 'power2.inOut' }, '-=0.4')
-        .from('.tool-row', {
+      // Subtitle: elastic y + opacity
+      tl.from(
+        '.hm-sub',
+        { autoAlpha: 0, y: 15, duration: 0.7, ease: 'back.out(1.2)' },
+        '-=0.5'
+      )
+
+      // Divider: scaleX + opacity
+      tl.from(
+        '.hm-rule',
+        {
           autoAlpha: 0,
-          y: 30,
-          skewY: 3,
+          scaleX: 0,
+          transformOrigin: 'left center',
+          duration: 0.8,
+          ease: 'power2.inOut',
+        },
+        '-=0.4'
+      )
+
+      // Tool rows: elastic y + opacity
+      tl.from(
+        '.tool-row',
+        {
+          autoAlpha: 0,
+          y: 20,
           duration: 0.7,
           stagger: 0.06,
-        }, '-=0.5')
+          ease: 'back.out(1.4)',
+        },
+        '-=0.5'
+      )
     }, listRef)
-  }, { scope: listRef })
-
-  // Parallax Brand Moment
-  useGSAP(() => {
-    gsap.to('.brand-moment', {
-      yPercent: -20,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: '.brand-moment',
-        start: 'top top',
-        end: 'bottom top',
-        scrub: 0.5,
-      },
-    })
   }, { scope: listRef })
 
   // Hover effect — each row independent, no cross-row animation
@@ -93,28 +124,36 @@ export default function HomePage() {
 
     const qt = rows.map((row) => ({
       rowX: gsap.quickTo(row, 'x', { duration: 0.25, ease: 'power2.out' }),
-      arrowX: gsap.quickTo(row.querySelector('.tool-arrow'), 'x', { duration: 0.25, ease: 'power2.out' }),
-      arrowOpacity: gsap.quickTo(row.querySelector('.tool-arrow'), 'autoAlpha', { duration: 0.25 }),
+      arrowX: gsap.quickTo(row.querySelector('.tool-arrow'), 'x', {
+        duration: 0.25,
+        ease: 'power2.out',
+      }),
+      arrowOpacity: gsap.quickTo(row.querySelector('.tool-arrow'), 'autoAlpha', {
+        duration: 0.25,
+      }),
     }))
 
     const enter = (i) => {
-      gsap.to(rows[i].querySelector('.tool-index'), { color: '#ffffff', duration: 0.2, overwrite: 'auto' })
+      gsap.to(rows[i].querySelector('.tool-index'), {
+        color: '#ffffff',
+        duration: 0.2,
+        overwrite: 'auto',
+      })
       qt[i].rowX(12)
       qt[i].arrowX(0)
       qt[i].arrowOpacity(1)
     }
 
     const leave = (i) => {
-      gsap.to(rows[i].querySelector('.tool-index'), { color: '#ffffff', duration: 0.3, overwrite: 'auto' })
+      gsap.to(rows[i].querySelector('.tool-index'), {
+        color: '#ffffff',
+        duration: 0.3,
+        overwrite: 'auto',
+      })
       qt[i].rowX(0)
       qt[i].arrowX(-8)
       qt[i].arrowOpacity(0)
     }
-
-    rows.forEach((row, i) => {
-      row.addEventListener('pointerenter', () => enter(i))
-      row.addEventListener('pointerleave', () => leave(i))
-    })
 
     const enterHandlers = []
     const leaveHandlers = []
