@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 
@@ -13,8 +13,8 @@ function Logo() {
 
     const hoverTl = gsap.timeline({ paused: true })
     hoverTl.to(paths, {
-      y: (i) => (i % 2 === 0 ? -2 : 2),
-      scale: 1.04,
+      y: (i) => (i % 2 === 0 ? -3 : 3),
+      scale: 1.05,
       transformOrigin: 'center center',
       duration: 0.3,
       ease: 'power2.out',
@@ -36,58 +36,27 @@ function Logo() {
   }, { scope: logoRef })
 
   return (
-    <Link to="/" className="flex items-center gap-3 group" ref={logoRef}>
-      <svg
-        width="28"
-        height="28"
-        viewBox="0 0 400 406"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
+    <Link to="/" className="flex items-center gap-2 group" ref={logoRef}>
+      <svg width="24" height="24" viewBox="0 0 400 406" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path ref={(el) => (pathRefs.current[0] = el)} d="M128.558 171.188V141.303H142.655C153.556 141.303 163.066 138.935 171.186 134.199C179.381 129.462 185.734 122.884 190.245 114.463C194.831 105.968 197.124 96.1944 197.124 85.1428C197.124 74.2415 194.831 64.6559 190.245 56.3859C185.734 48.0408 179.381 41.5376 171.186 36.8764C163.066 32.2152 153.556 29.8845 142.655 29.8845H128.558V0H143.106C161.149 0.0751847 176.975 3.72147 190.583 10.9389C204.191 18.1563 214.791 28.1554 222.385 40.9362C230.053 53.717 233.887 68.4525 233.887 85.1428C233.887 102.059 230.053 116.982 222.385 129.913C214.791 142.844 204.191 152.956 190.583 160.249C176.975 167.541 161.149 171.188 143.106 171.188H128.558ZM58.4139 171.188V141.303H79.0512V29.8845H58.4139V0H136.339V29.8845H114.236V141.303H136.339V171.188H58.4139Z" fill="#338bff" />
         <path ref={(el) => (pathRefs.current[1] = el)} d="M71.3847 225.319H98.5628V297.944H71.3847V225.319ZM112.208 205.584V170.399H171.188V337.076H141.303V316.439H29.8846V337.076H0V172.429H58.9798V207.614H29.8846V281.254H141.303V205.584H112.208Z" fill="#338bff" />
         <path ref={(el) => (pathRefs.current[2] = el)} d="M276.516 234.567V264.452H262.42C251.518 264.452 242.008 266.82 233.888 271.556C225.694 276.293 219.341 282.871 214.83 291.291C210.244 299.787 207.951 309.56 207.951 320.612C207.951 331.513 210.244 341.099 214.83 349.369C219.341 357.714 225.694 364.217 233.888 368.878C242.008 373.54 251.518 375.87 262.42 375.87H276.516V405.755H261.969C243.925 405.68 228.099 402.033 214.492 394.816C200.884 387.599 190.283 377.6 182.69 364.819C175.021 352.038 171.187 337.302 171.187 320.612C171.187 303.696 175.021 288.773 182.69 275.842C190.283 262.911 200.884 252.799 214.492 245.506C228.099 238.214 243.925 234.567 261.969 234.567H276.516ZM346.66 234.567V264.452H326.023V375.87H346.66V405.755H268.735V375.87H290.838V264.452H268.735V234.567H346.66Z" fill="#338bff" />
         <path ref={(el) => (pathRefs.current[3] = el)} d="M223.287 149.309C223.287 136.377 225.43 124.499 229.715 113.673C234.075 102.847 240.203 93.4866 248.097 85.5925C256.066 77.7737 265.464 71.684 276.29 67.3235C287.191 63.0382 299.145 60.8955 312.151 60.8955C325.082 60.8955 336.886 63.0006 347.562 67.2107C358.313 71.4961 367.598 77.3978 375.416 84.9159C383.235 92.434 389.287 101.193 393.573 111.192C397.858 121.266 400.001 132.13 400.001 143.783C400.001 154.609 398.046 163.856 394.137 171.525C390.302 179.268 384.626 185.396 377.108 189.907C369.665 194.493 360.455 197.462 349.479 198.815V207.161L328.842 200.056C340.269 197.124 349.366 191.147 356.132 182.125C362.899 173.104 366.282 162.277 366.282 149.647C366.282 139.422 363.989 130.401 359.403 122.582C354.892 114.838 348.539 108.748 340.344 104.313C332.225 99.9522 322.827 97.7719 312.151 97.7719C304.032 97.7719 296.589 99.0124 289.822 101.493C283.056 104.05 277.192 107.583 272.23 112.094C267.343 116.68 263.584 122.131 260.953 128.446C258.321 134.761 257.006 141.715 257.006 149.309C257.006 158.03 258.697 165.849 262.08 172.765C265.539 179.757 270.388 185.546 276.628 190.132C282.868 194.718 290.198 197.801 298.619 199.379L292.529 235.466C278.62 232.985 266.441 227.798 255.991 219.904C245.616 212.085 237.571 202.123 231.858 190.019C226.144 177.99 223.287 164.42 223.287 149.309ZM328.842 200.056H397.294V235.241H328.842V200.056Z" fill="#338bff" />
       </svg>
-      <span className="font-display text-base font-bold tracking-tight text-ink">
-        DCDE·make
-      </span>
+      <span className="font-display text-sm font-bold tracking-tight text-ink">DCDE·make</span>
     </Link>
   )
 }
 
 export default function SiteHeader() {
-  const location = useLocation()
-
-  const isActive = (path) => location.pathname === path
-
   return (
-    <header className="sticky top-0 z-50 bg-canvas border-b border-canvas-deep">
-      <div className="mx-auto max-w-[1200px] flex items-center justify-between h-16" style={{ padding: '0 var(--spacing-page)' }}>
-        <Logo />
-
-        <nav className="flex items-center gap-6">
-          <Link
-            to="/"
-            className={`dcde-nav-link ${isActive('/') ? 'dcde-nav-link-active' : ''}`}
-          >
-            工具
-          </Link>
-          <Link
-            to="/about"
-            className={`dcde-nav-link ${isActive('/about') ? 'dcde-nav-link-active' : ''}`}
-          >
-            关于
-          </Link>
-          <a
-            href="mailto:hello@dcde.club"
-            className="dcde-btn-primary text-sm"
-            style={{ padding: '8px 20px' }}
-          >
-            联系我们
-          </a>
-        </nav>
-      </div>
+    <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between h-16" style={{ padding: '0 var(--spacing-page)' }}>
+      <Logo />
+      <nav>
+        <Link to="/about" className="dcde-body text-ink-dim hover:text-accent transition-colors">
+          关于
+        </Link>
+      </nav>
     </header>
   )
 }

@@ -18,7 +18,7 @@ function ScrollToTop() {
 
 function App() {
   return (
-    <div className="min-h-[100dvh] bg-canvas-soft text-ink">
+    <div className="min-h-[100dvh] bg-void text-ink">
       <ScrollToTop />
       <SiteHeader />
       <main>

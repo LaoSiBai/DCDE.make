@@ -6,107 +6,94 @@ export default function ToolPage() {
   const { toolId } = useParams()
   const tool = getToolById(toolId)
 
-  const categoryLabels = {
-    color: '色彩',
-    layout: '布局',
-    typography: '字体',
-    asset: '素材',
-    accessibility: '无障碍',
-  }
-
   if (!tool) {
     return (
-      <div className="bg-canvas-soft min-h-[60dvh] flex items-center justify-center" style={{ padding: 'var(--spacing-section) var(--spacing-page)' }}>
+      <div className="min-h-[80dvh] flex items-center justify-center" style={{ padding: '0 var(--spacing-page)' }}>
         <div className="text-center">
-          <p className="dcde-display-sm text-mute mb-6">Tool not found</p>
-          <Link to="/" className="dcde-btn-primary">返回首页</Link>
+          <p className="dcde-lg text-ink-dim mb-6">Tool not found</p>
+          <Link to="/" className="dcde-pill">返回首页</Link>
         </div>
       </div>
     )
   }
 
   return (
-    <div>
-      {/* Breadcrumb + Meta */}
-      <section className="bg-canvas-soft border-b border-canvas-deep" style={{ padding: 'var(--spacing-section) var(--spacing-page)' }}>
-        <div className="mx-auto max-w-[1200px]">
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 dcde-body-sm-strong text-mute hover:text-primary transition-colors mb-6"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            返回工具列表
-          </Link>
+    <div className="min-h-[100dvh]" style={{ padding: '0 var(--spacing-page)' }}>
+      {/* Back + Title */}
+      <div className="pt-20 pb-8">
+        <Link
+          to="/"
+          className="dcde-ghost text-ink-dim hover:text-accent mb-8 inline-flex"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          返回
+        </Link>
 
-          <div className="flex flex-wrap items-center gap-3 mb-4">
-            <span className="dcde-badge dcde-badge-green">{categoryLabels[tool.category]}</span>
-            <span className="dcde-caption text-mute">{tool.nameEn}</span>
-          </div>
+        <h1 className="dcde-mega text-ink mt-4">
+          {tool.name}
+        </h1>
+      </div>
 
-          <h1 className="dcde-display-xl text-ink mb-4">{tool.name}</h1>
-          <p className="dcde-body-lg text-body max-w-2xl">{tool.description}</p>
-        </div>
-      </section>
+      <div className="dcde-rule-solid mb-8" />
 
       {/* Workspace */}
-      <section className="bg-canvas" style={{ padding: 'var(--spacing-section) var(--spacing-page)' }}>
-        <div className="mx-auto max-w-[1200px]">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left Panel: Controls */}
-            <div className="lg:col-span-1">
-              <div className="dcde-card border border-ink/5 sticky top-24">
-                <h3 className="dcde-display-xs text-ink mb-6">参数设置</h3>
-
-                <div className="space-y-5">
-                  <div>
-                    <label className="dcde-body-sm-strong text-ink block mb-2">输入值</label>
-                    <input type="text" placeholder="请输入..." className="dcde-input" disabled />
-                  </div>
-                  <div>
-                    <label className="dcde-body-sm-strong text-ink block mb-2">模式</label>
-                    <div className="flex gap-2">
-                      <button className="dcde-btn-secondary flex-1 text-sm" style={{ padding: '8px 12px' }}>模式 A</button>
-                      <button className="dcde-btn-tertiary flex-1 text-sm" style={{ padding: '8px 12px' }}>模式 B</button>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="dcde-body-sm-strong text-ink block mb-2">选项</label>
-                    <div className="h-2 w-full bg-canvas-deep rounded-full overflow-hidden">
-                      <div className="h-full w-1/2 bg-primary rounded-full" />
-                    </div>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pb-24">
+        {/* Left: Controls */}
+        <div className="lg:col-span-3">
+          <div className="lg:sticky lg:top-20">
+            <div className="bg-void-raised rounded-2xl p-6" style={{ border: '1px solid rgba(255,255,255,0.06)' }}>
+              <h3 className="dcde-caption text-ink-dim mb-6">参数</h3>
+              <div className="space-y-5">
+                <div>
+                  <label className="dcde-body text-ink-dim block mb-2">输入</label>
+                  <input
+                    type="text"
+                    placeholder="..."
+                    disabled
+                    className="w-full bg-void text-ink border border-ink-faint rounded-xl px-4 py-3 text-sm outline-none focus:border-accent transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="dcde-body text-ink-dim block mb-2">模式</label>
+                  <div className="flex gap-2">
+                    <button className="flex-1 bg-accent text-void rounded-xl py-2.5 text-sm font-bold">A</button>
+                    <button className="flex-1 bg-void-raised text-ink-dim border border-ink-faint rounded-xl py-2.5 text-sm font-medium hover:text-ink transition-colors">B</button>
                   </div>
                 </div>
-
-                <div className="mt-8 pt-6 border-t border-canvas-deep">
-                  <button className="dcde-btn-primary w-full">
-                    应用更改
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </button>
+                <div>
+                  <label className="dcde-body text-ink-dim block mb-2">强度</label>
+                  <div className="h-1.5 w-full bg-ink-faint rounded-full overflow-hidden">
+                    <div className="h-full w-2/3 bg-accent rounded-full" />
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Right Panel: Canvas */}
-            <div className="lg:col-span-2">
-              <div
-                className="dcde-card border border-ink/5 flex items-center justify-center bg-canvas-soft"
-                style={{ minHeight: '500px' }}
-              >
-                <div className="text-center">
-                  <div className="w-20 h-20 mx-auto mb-6 rounded-full border-2 border-dashed border-primary/30 flex items-center justify-center">
-                    <div className="w-4 h-4 rounded-full bg-primary/40" />
-                  </div>
-                  <p className="dcde-display-xs text-ink mb-2">工具开发中</p>
-                  <p className="dcde-body-md text-mute">Coming Soon</p>
-                  <p className="dcde-caption text-mute mt-4 max-w-sm mx-auto">
-                    核心功能正在开发中。当前展示的是工具的 UI 框架和交互骨架。
-                  </p>
-                </div>
+              <div className="mt-8 pt-6" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                <button className="dcde-pill w-full justify-center">
+                  应用
+                  <ArrowRight className="w-4 h-4" />
+                </button>
               </div>
             </div>
           </div>
         </div>
-      </section>
+
+        {/* Right: Canvas */}
+        <div className="lg:col-span-9">
+          <div
+            className="bg-void-raised rounded-2xl flex items-center justify-center"
+            style={{ minHeight: '60vh', border: '1px solid rgba(255,255,255,0.06)' }}
+          >
+            <div className="text-center">
+              <div className="w-16 h-16 mx-auto mb-6 rounded-full border-2 border-dashed border-accent/30 flex items-center justify-center">
+                <div className="w-3 h-3 rounded-full bg-accent/50" />
+              </div>
+              <p className="dcde-lg text-ink mb-2">工具开发中</p>
+              <p className="dcde-body text-ink-dim">Coming Soon</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

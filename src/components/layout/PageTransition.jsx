@@ -32,7 +32,7 @@ export default function PageTransition({ children }) {
     const overlay = document.createElement('div')
     overlay.style.position = 'fixed'
     overlay.style.inset = '0'
-    overlay.style.backgroundColor = '#EFEFEF'
+    overlay.style.backgroundColor = '#050508'
     overlay.style.zIndex = '9998'
     overlay.style.opacity = '0'
     document.body.appendChild(overlay)
