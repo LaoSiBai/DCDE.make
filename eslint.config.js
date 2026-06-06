@@ -7,6 +7,12 @@ export default defineConfig([
   globalIgnores(['dist', 'node_modules']),
   {
     files: ['**/*.{js,jsx}'],
+    languageOptions: {
+      parserOptions: {
+        ecmaFeatures: { jsx: true },
+        sourceType: 'module',
+      },
+    },
     plugins: {
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,

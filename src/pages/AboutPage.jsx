@@ -11,6 +11,20 @@ export default function AboutPage() {
   const pageRef = useRef(null)
 
   useGSAP(() => {
+    const reduced =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    if (reduced) {
+      gsap.set('.ap-back, .ap-title, .ap-rule, .ap-lead', {
+        autoAlpha: 1,
+        y: 0,
+        scaleX: 1,
+      })
+      gsap.set('.ap-item', { autoAlpha: 1, y: 0, scale: 1 })
+      return
+    }
+
     const tl = gsap.timeline({ defaults: { ease: 'expo.out', duration: 0.6 } })
 
     tl.from('.ap-back', { autoAlpha: 0, y: -10 })
@@ -21,8 +35,19 @@ export default function AboutPage() {
 
   // Principles ScrollTrigger Reveal — smooth deceleration, no overshoot
   useGSAP(() => {
+    const reduced =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
     const items = gsap.utils.toArray('.ap-item', pageRef.current)
     items.forEach((item) => {
+      if (reduced) {
+        gsap.set(item.querySelector('.dcde-caption'), { autoAlpha: 1, scale: 1 })
+        gsap.set(item.querySelector('h3'), { autoAlpha: 1, y: 0 })
+        gsap.set(item.querySelector('p'), { autoAlpha: 1, y: 0 })
+        return
+      }
+
       const numEl = item.querySelector('.dcde-caption')
       const titleEl = item.querySelector('h3')
       const descEl = item.querySelector('p')
@@ -51,14 +76,14 @@ export default function AboutPage() {
   // Back button arrow shift
   const handleBackEnter = (e) => {
     gsap.to(e.currentTarget.querySelector('.back-arrow'), {
-      y: -2,
+      x: -3,
       duration: 0.35,
       ease: 'expo.out',
     })
   }
   const handleBackLeave = (e) => {
     gsap.to(e.currentTarget.querySelector('.back-arrow'), {
-      y: 0,
+      x: 0,
       duration: 0.35,
       ease: 'expo.out',
     })

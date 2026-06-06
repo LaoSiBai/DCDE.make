@@ -13,6 +13,20 @@ export default function ToolPage() {
   const pageRef = useRef(null)
 
   useGSAP(() => {
+    const reduced =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    if (reduced) {
+      gsap.set('.tp-back, .tp-title, .tp-desc, .tp-rule, .tp-sidebar, .tp-canvas', {
+        autoAlpha: 1,
+        y: 0,
+        scaleX: 1,
+        scale: 1,
+      })
+      return
+    }
+
     const tl = gsap.timeline({ defaults: { ease: 'expo.out', duration: 0.6 } })
 
     tl.from('.tp-back', { autoAlpha: 0, y: -10 })
@@ -25,29 +39,32 @@ export default function ToolPage() {
 
   // Canvas Breath animation — continuous, not entrance
   useGSAP(() => {
+    const reduced =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
     const canvasContent = pageRef.current?.querySelector('.tp-canvas > div')
-    if (canvasContent) {
-      gsap.to(canvasContent, {
-        scale: 0.985,
-        autoAlpha: 0.9,
-        duration: 3,
-        ease: 'sine.inOut',
-        yoyo: true,
-        repeat: -1,
-      })
-    }
+    if (!canvasContent || reduced) return
+
+    gsap.to(canvasContent, {
+      scale: 0.985,
+      duration: 3,
+      ease: 'sine.inOut',
+      yoyo: true,
+      repeat: -1,
+    })
   }, { scope: pageRef })
 
   const handleBackEnter = (e) => {
     gsap.to(e.currentTarget.querySelector('.back-arrow'), {
-      y: -2,
+      x: -3,
       duration: 0.35,
       ease: 'expo.out',
     })
   }
   const handleBackLeave = (e) => {
     gsap.to(e.currentTarget.querySelector('.back-arrow'), {
-      y: 0,
+      x: 0,
       duration: 0.35,
       ease: 'expo.out',
     })

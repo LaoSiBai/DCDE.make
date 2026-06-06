@@ -5,22 +5,19 @@ import gsap from 'gsap'
 export default function PageTransition({ children }) {
   const location = useLocation()
   const containerRef = useRef(null)
-  const prevPath = useRef(null)
-  const isFirstRender = useRef(true)
+  const lastKeyRef = useRef(null)
 
   // Apple Fluid Motion entrance on every route change (skip first render)
   useLayoutEffect(() => {
     const el = containerRef.current
     if (!el) return
 
-    if (isFirstRender.current) {
-      isFirstRender.current = false
-      prevPath.current = location.pathname
-      return
-    }
+    const currentKey = location.key
+    const prevKey = lastKeyRef.current
+    lastKeyRef.current = currentKey
 
-    if (prevPath.current === location.pathname) return
-    prevPath.current = location.pathname
+    // Skip first render (when key is null or hasn't changed)
+    if (prevKey === null || prevKey === currentKey) return
 
     const target = el.firstElementChild
     if (!target) return
@@ -49,7 +46,7 @@ export default function PageTransition({ children }) {
         clearProps: 'opacity,visibility,y',
       }
     )
-  }, [location.pathname])
+  }, [location.key])
 
   return (
     <div ref={containerRef} className="relative">

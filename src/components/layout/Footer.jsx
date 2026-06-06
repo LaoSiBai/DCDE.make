@@ -42,7 +42,7 @@ export default function Footer() {
 
   return (
     <footer ref={footerRef} style={{ padding: '0 var(--spacing-page)' }}>
-      <div className="dcde-rule-solid mb-6 dcde-blur-fade-in" />
+      <div className="dcde-rule-solid mb-6" style={{ opacity: 0.6 }} />
       <div className="flex items-center justify-between py-6">
         <span className="dcde-footer-link dcde-blur-fade-in">
           © {new Date().getFullYear()} DCDE

@@ -5,11 +5,38 @@ import gsap from 'gsap'
 import { tools } from '../data/tools.registry.js'
 import Logo from '../components/ui/Logo.jsx'
 
+// Pre-render animated title chars to avoid React reconciliation conflicts
+function AnimatedTitle({ text, className }) {
+  const chars = text.split('').map((ch, i) => {
+    if (ch === ' ') {
+      return (
+        <span key={i} className="hm-title-char" style={{ display: 'inline-block', width: '0.3em' }}>
+          &nbsp;
+        </span>
+      )
+    }
+    if (ch === '·') {
+      return (
+        <span key={i} className="hm-title-char text-accent" style={{ display: 'inline-block' }}>
+          ·
+        </span>
+      )
+    }
+    return (
+      <span key={i} className="hm-title-char" style={{ display: 'inline-block' }}>
+        {ch}
+      </span>
+    )
+  })
+
+  return <h1 className={className}>{chars}</h1>
+}
+
 export default function HomePage() {
   const listRef = useRef(null)
   const navigate = useNavigate()
 
-  // Apple Fluid Motion entrance — smooth deceleration, no overshoot
+  // Apple Fluid Motion entrance
   useGSAP(() => {
     const reduced =
       typeof window !== 'undefined' &&
@@ -28,39 +55,13 @@ export default function HomePage() {
 
       const tl = gsap.timeline({ defaults: { ease: 'expo.out', duration: 0.6 } })
 
-      // Logo: scale + opacity, heavy friction deceleration
+      // Logo: scale + opacity
       tl.from('.hm-logo-svg', { autoAlpha: 0, scale: 0.92 })
 
-      // Title char-by-char: y + rotateX + opacity
-      const titleEl = listRef.current?.querySelector('.hm-title')
-      if (titleEl) {
-        const text = titleEl.textContent
-        titleEl.innerHTML = ''
-        const chars = []
-        for (const ch of text) {
-          if (ch === ' ') {
-            const space = document.createElement('span')
-            space.innerHTML = '&nbsp;'
-            space.style.display = 'inline-block'
-            space.style.width = '0.3em'
-            titleEl.appendChild(space)
-            chars.push(space)
-          } else if (ch === '·') {
-            const dot = document.createElement('span')
-            dot.textContent = '·'
-            dot.className = 'text-accent'
-            dot.style.display = 'inline-block'
-            titleEl.appendChild(dot)
-            chars.push(dot)
-          } else {
-            const span = document.createElement('span')
-            span.textContent = ch
-            span.style.display = 'inline-block'
-            titleEl.appendChild(span)
-            chars.push(span)
-          }
-        }
-        tl.from(chars, {
+      // Title chars: y + rotateX + opacity
+      const charSpans = gsap.utils.toArray('.hm-title-char', listRef.current)
+      if (charSpans.length) {
+        tl.from(charSpans, {
           autoAlpha: 0,
           y: 14,
           rotateX: -30,
@@ -87,6 +88,8 @@ export default function HomePage() {
         stagger: 0.06,
       }, '-=0.4')
     }, listRef)
+
+    return () => ctx.revert()
   }, { scope: listRef })
 
   // Hover effect — each row independent, interruptible quickTo
@@ -95,6 +98,7 @@ export default function HomePage() {
     if (!container) return
 
     const rows = gsap.utils.toArray('.tool-row', container)
+    if (!rows.length) return
 
     const qt = rows.map((row) => ({
       rowX: gsap.quickTo(row, 'x', { duration: 0.35, ease: 'expo.out' }),
@@ -106,6 +110,14 @@ export default function HomePage() {
         duration: 0.35,
       }),
     }))
+
+    // Initialize arrow state
+    rows.forEach((row) => {
+      const arrow = row.querySelector('.tool-arrow')
+      if (arrow) {
+        gsap.set(arrow, { x: -8, autoAlpha: 0 })
+      }
+    })
 
     const enter = (i) => {
       gsap.to(rows[i].querySelector('.tool-index'), {
@@ -120,7 +132,7 @@ export default function HomePage() {
 
     const leave = (i) => {
       gsap.to(rows[i].querySelector('.tool-index'), {
-        color: '#ffffff',
+        color: 'rgba(255, 255, 255, 0.18)',
         duration: 0.3,
         overwrite: 'auto',
       })
@@ -169,9 +181,10 @@ export default function HomePage() {
             className="hm-logo-svg"
             style={{ height: 'clamp(48px, 7.5vw, 120px)', width: 'auto', flexShrink: 0 }}
           />
-          <h1 className="hm-title dcde-mega text-ink leading-none">
-            DCDE<span className="text-accent">·</span>make
-          </h1>
+          <AnimatedTitle
+            text="DCDE·make"
+            className="hm-title dcde-mega text-ink leading-none"
+          />
         </div>
         <p className="hm-sub dcde-body text-ink-dim">
           {tools.length} tools for visual designers
@@ -190,10 +203,19 @@ export default function HomePage() {
             className="tool-row cursor-pointer border-b border-ink-faint"
             style={{ padding: '3.5vh 0' }}
             onClick={() => handleClick(tool.id)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                handleClick(tool.id)
+              }
+            }}
+            aria-label={`${tool.name}，${categoryLabels[tool.category]}`}
           >
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-baseline gap-4 md:gap-8">
-                <span className="tool-index dcde-index flex-shrink-0 w-8 md:w-12 text-ink">
+                <span className="tool-index dcde-index flex-shrink-0 w-8 md:w-12 text-ink-faint">
                   {String(index + 1).padStart(2, '0')}
                 </span>
                 <h2 className="tool-name dcde-xl text-ink transition-colors duration-200">
