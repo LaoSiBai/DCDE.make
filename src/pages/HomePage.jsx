@@ -116,10 +116,21 @@ export default function HomePage() {
       row.addEventListener('pointerleave', () => leave(i))
     })
 
+    const enterHandlers = []
+    const leaveHandlers = []
+    rows.forEach((row, i) => {
+      const onEnter = () => enter(i)
+      const onLeave = () => leave(i)
+      enterHandlers.push(onEnter)
+      leaveHandlers.push(onLeave)
+      row.addEventListener('pointerenter', onEnter)
+      row.addEventListener('pointerleave', onLeave)
+    })
+
     return () => {
-      rows.forEach((row) => {
-        row.removeEventListener('pointerenter', null)
-        row.removeEventListener('pointerleave', null)
+      rows.forEach((row, i) => {
+        row.removeEventListener('pointerenter', enterHandlers[i])
+        row.removeEventListener('pointerleave', leaveHandlers[i])
       })
     }
   }, { scope: listRef })
@@ -133,13 +144,7 @@ export default function HomePage() {
   }
 
   const handleClick = (toolId) => {
-    if (window.__dcdeExpand) {
-      const el = listRef.current?.querySelector(`[data-tool="${toolId}"]`)
-      if (el) window.__dcdeExpand(el, toolId)
-      else navigate(`/tool/${toolId}`)
-    } else {
-      navigate(`/tool/${toolId}`)
-    }
+    navigate(`/tool/${toolId}`)
   }
 
   return (
