@@ -7,12 +7,10 @@ gsap.registerPlugin(ScrollTrigger)
 
 export default function ScrollProgress() {
   const barRef = useRef(null)
-  const triggerRef = useRef(null)
 
   useGSAP(() => {
     const el = barRef.current
-    const trigger = triggerRef.current
-    if (!el || !trigger) return
+    if (!el) return
 
     const ctx = gsap.context(() => {
       gsap.fromTo(
@@ -22,7 +20,7 @@ export default function ScrollProgress() {
           scaleX: 1,
           ease: 'none',
           scrollTrigger: {
-            trigger,
+            trigger: document.body,
             start: 'top top',
             end: 'bottom bottom',
             scrub: true,
@@ -36,18 +34,15 @@ export default function ScrollProgress() {
   }, [])
 
   return (
-    <>
-      <div ref={triggerRef} className="h-full min-h-screen" aria-hidden="true" />
-      <div
-        ref={barRef}
-        className="fixed top-0 left-0 w-full h-[2px] bg-accent"
-        style={{
-          zIndex: 9998,
-          transformOrigin: 'left center',
-          willChange: 'transform',
-        }}
-        aria-hidden="true"
-      />
-    </>
+    <div
+      ref={barRef}
+      className="fixed top-0 left-0 w-full h-[2px] bg-accent"
+      style={{
+        zIndex: 9998,
+        transformOrigin: 'left center',
+        willChange: 'transform',
+      }}
+      aria-hidden="true"
+    />
   )
 }

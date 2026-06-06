@@ -1,25 +1,33 @@
-import { useRef, useLayoutEffect } from 'react'
+import { useRef, useLayoutEffect, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
-import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 
 export default function PageTransition({ children }) {
   const location = useLocation()
   const containerRef = useRef(null)
-  const prevPath = useRef(location.pathname)
+  const prevPath = useRef(null)
+  const isFirstRender = useRef(true)
 
-  // Entrance animation on every route change
+  // Entrance animation on every route change (skip first render)
   useLayoutEffect(() => {
     const el = containerRef.current
     if (!el) return
 
-    // Only animate if path actually changed
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      prevPath.current = location.pathname
+      return
+    }
+
     if (prevPath.current === location.pathname) return
     prevPath.current = location.pathname
 
+    const target = el.firstElementChild
+    if (!target) return
+
     const ctx = gsap.context(() => {
       gsap.fromTo(
-        el.children[0],
+        target,
         { autoAlpha: 0, y: 24 },
         { autoAlpha: 1, y: 0, duration: 0.7, ease: 'power3.out', clearProps: 'opacity,visibility,y' }
       )
