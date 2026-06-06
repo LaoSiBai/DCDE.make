@@ -8,16 +8,16 @@ export default function NotFoundPage() {
   const pageRef = useRef(null)
 
   useGSAP(() => {
-    const tl = gsap.timeline({ defaults: { ease: 'power3.out', duration: 0.35 } })
+    const tl = gsap.timeline({ defaults: { ease: 'expo.out', duration: 0.6 } })
 
-    // 404 Counter — quick snap count
+    // 404 Counter — snap count with heavy friction
     const codeEl = pageRef.current?.querySelector('.nf-code')
     if (codeEl) {
       const counter = { val: 0 }
       tl.to(counter, {
         val: 404,
-        duration: 0.6,
-        ease: 'power3.out',
+        duration: 0.8,
+        ease: 'expo.out',
         snap: { val: 1 },
         onUpdate: () => {
           codeEl.innerText = String(Math.round(counter.val)).padStart(3, '0')
@@ -25,8 +25,8 @@ export default function NotFoundPage() {
       })
     }
 
-    tl.from('.nf-title', { autoAlpha: 0, y: 14 }, '-=0.2')
-      .from('.nf-btn', { autoAlpha: 0, y: 10 }, '-=0.2')
+    tl.from('.nf-title', { autoAlpha: 0, y: 12 }, '-=0.4')
+      .from('.nf-btn', { autoAlpha: 0, y: 8 }, '-=0.4')
   }, { scope: pageRef })
 
   return (

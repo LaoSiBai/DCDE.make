@@ -11,12 +11,12 @@ export default function AboutPage() {
   const pageRef = useRef(null)
 
   useGSAP(() => {
-    const tl = gsap.timeline({ defaults: { ease: 'power3.out', duration: 0.35 } })
+    const tl = gsap.timeline({ defaults: { ease: 'expo.out', duration: 0.6 } })
 
-    tl.from('.ap-back', { autoAlpha: 0, x: -8 })
-      .from('.ap-title', { autoAlpha: 0, y: 24 }, '-=0.2')
-      .from('.ap-rule', { autoAlpha: 0, scaleX: 0, transformOrigin: 'left center', duration: 0.5, ease: 'power2.inOut' }, '-=0.2')
-      .from('.ap-lead', { autoAlpha: 0, y: 12 }, '-=0.2')
+    tl.from('.ap-back', { autoAlpha: 0, y: -10 })
+      .from('.ap-title', { autoAlpha: 0, y: 20 }, '-=0.4')
+      .from('.ap-rule', { autoAlpha: 0, scaleX: 0, transformOrigin: 'left center', duration: 0.7, ease: 'expo.out' }, '-=0.4')
+      .from('.ap-lead', { autoAlpha: 0, y: 10 }, '-=0.4')
   }, { scope: pageRef })
 
   // Principles ScrollTrigger Reveal — smooth deceleration, no overshoot
@@ -33,17 +33,17 @@ export default function AboutPage() {
           start: 'top 85%',
           once: true,
         },
-        defaults: { ease: 'power3.out', duration: 0.35 },
+        defaults: { ease: 'expo.out', duration: 0.6 },
       })
 
       if (numEl) {
-        tl.from(numEl, { autoAlpha: 0, scale: 0.8 })
+        tl.from(numEl, { autoAlpha: 0, scale: 0.85 })
       }
       if (titleEl) {
-        tl.from(titleEl, { autoAlpha: 0, y: 16 }, '-=0.2')
+        tl.from(titleEl, { autoAlpha: 0, y: 14 }, '-=0.4')
       }
       if (descEl) {
-        tl.from(descEl, { autoAlpha: 0, y: 10 }, '-=0.2')
+        tl.from(descEl, { autoAlpha: 0, y: 8 }, '-=0.4')
       }
     })
   }, { scope: pageRef })
@@ -51,16 +51,16 @@ export default function AboutPage() {
   // Back button arrow shift
   const handleBackEnter = (e) => {
     gsap.to(e.currentTarget.querySelector('.back-arrow'), {
-      x: -4,
-      duration: 0.25,
-      ease: 'power3.out',
+      y: -2,
+      duration: 0.35,
+      ease: 'expo.out',
     })
   }
   const handleBackLeave = (e) => {
     gsap.to(e.currentTarget.querySelector('.back-arrow'), {
-      x: 0,
-      duration: 0.25,
-      ease: 'power3.out',
+      y: 0,
+      duration: 0.35,
+      ease: 'expo.out',
     })
   }
 

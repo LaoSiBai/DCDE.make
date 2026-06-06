@@ -33,20 +33,20 @@ export default function PageTransition({ children }) {
       window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
     if (reduced) {
-      gsap.set(target, { autoAlpha: 1, x: 0 })
+      gsap.set(target, { autoAlpha: 1, y: 0 })
       return
     }
 
-    // Apple Fluid Motion: fast start, ultra-smooth deceleration (power3.out)
+    // Physics-based: vertical drop with heavy friction deceleration (expo.out)
     gsap.fromTo(
       target,
-      { autoAlpha: 0, x: 24 },
+      { autoAlpha: 0, y: 16 },
       {
         autoAlpha: 1,
-        x: 0,
-        duration: 0.35,
-        ease: 'power3.out',
-        clearProps: 'opacity,visibility,x',
+        y: 0,
+        duration: 0.6,
+        ease: 'expo.out',
+        clearProps: 'opacity,visibility,y',
       }
     )
   }, [location.pathname])

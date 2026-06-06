@@ -13,14 +13,14 @@ export default function ToolPage() {
   const pageRef = useRef(null)
 
   useGSAP(() => {
-    const tl = gsap.timeline({ defaults: { ease: 'power3.out', duration: 0.35 } })
+    const tl = gsap.timeline({ defaults: { ease: 'expo.out', duration: 0.6 } })
 
-    tl.from('.tp-back', { autoAlpha: 0, x: -8 })
-      .from('.tp-title', { autoAlpha: 0, y: 30 }, '-=0.2')
-      .from('.tp-desc', { autoAlpha: 0, y: 12 }, '-=0.2')
-      .from('.tp-rule', { autoAlpha: 0, scaleX: 0, transformOrigin: 'left center', duration: 0.5, ease: 'power2.inOut' }, '-=0.2')
-      .from('.tp-sidebar', { autoAlpha: 0, x: -16 }, '-=0.2')
-      .from('.tp-canvas', { autoAlpha: 0, scale: 0.98 }, '-=0.2')
+    tl.from('.tp-back', { autoAlpha: 0, y: -10 })
+      .from('.tp-title', { autoAlpha: 0, y: 24 }, '-=0.4')
+      .from('.tp-desc', { autoAlpha: 0, y: 10 }, '-=0.4')
+      .from('.tp-rule', { autoAlpha: 0, scaleX: 0, transformOrigin: 'left center', duration: 0.7, ease: 'expo.out' }, '-=0.4')
+      .from('.tp-sidebar', { autoAlpha: 0, y: 16 }, '-=0.4')
+      .from('.tp-canvas', { autoAlpha: 0, scale: 0.98 }, '-=0.4')
   }, { scope: pageRef })
 
   // Canvas Breath animation — continuous, not entrance
@@ -40,16 +40,16 @@ export default function ToolPage() {
 
   const handleBackEnter = (e) => {
     gsap.to(e.currentTarget.querySelector('.back-arrow'), {
-      x: -4,
-      duration: 0.25,
-      ease: 'power3.out',
+      y: -2,
+      duration: 0.35,
+      ease: 'expo.out',
     })
   }
   const handleBackLeave = (e) => {
     gsap.to(e.currentTarget.querySelector('.back-arrow'), {
-      x: 0,
-      duration: 0.25,
-      ease: 'power3.out',
+      y: 0,
+      duration: 0.35,
+      ease: 'expo.out',
     })
   }
 

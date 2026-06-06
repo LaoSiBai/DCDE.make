@@ -123,8 +123,8 @@
     border-radius: 9999px;
     cursor: pointer;
     border: none;
-    transition: transform 0.35s var(--ease-apple-active),
-                background-color 0.35s var(--ease-apple);
+    transition: transform 0.45s var(--ease-apple-active),
+                background-color 0.45s var(--ease-apple);
     white-space: nowrap;
   }
 
@@ -154,8 +154,8 @@
     white-space: nowrap;
     cursor: pointer;
     border: none;
-    transition: transform 0.35s var(--ease-apple-active),
-                background-color 0.35s var(--ease-apple);
+    transition: transform 0.45s var(--ease-apple-active),
+                background-color 0.45s var(--ease-apple);
   }
 
   .dcde-tag-accent:hover {
@@ -183,8 +183,8 @@
     white-space: nowrap;
     cursor: pointer;
     border: none;
-    transition: transform 0.35s var(--ease-apple-active),
-                background-color 0.35s var(--ease-apple);
+    transition: transform 0.45s var(--ease-apple-active),
+                background-color 0.45s var(--ease-apple);
   }
 
   .dcde-tag-muted:hover {
@@ -209,8 +209,8 @@
     cursor: pointer;
     border: none;
     background: none;
-    transition: opacity 0.35s var(--ease-apple),
-                transform 0.35s var(--ease-apple-active);
+    transition: opacity 0.45s var(--ease-apple),
+                transform 0.45s var(--ease-apple-active);
     white-space: nowrap;
   }
 
@@ -269,9 +269,9 @@
     filter: blur(12px);
     transform: translateY(20px);
     will-change: filter, opacity;
-    transition: opacity 0.35s var(--ease-apple),
-                filter 0.35s var(--ease-apple),
-                transform 0.35s var(--ease-apple);
+    transition: opacity 0.5s var(--ease-apple),
+                filter 0.5s var(--ease-apple),
+                transform 0.5s var(--ease-apple);
   }
 
   .dcde-blur-fade-in.is-visible {
@@ -295,8 +295,8 @@
     border: none;
     background: none;
     text-decoration: none;
-    transition: opacity 0.35s var(--ease-apple),
-                transform 0.35s var(--ease-apple-active);
+    transition: opacity 0.45s var(--ease-apple),
+                transform 0.45s var(--ease-apple-active);
   }
 
   /* Hover only on pointer devices */

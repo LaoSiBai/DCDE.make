@@ -15,9 +15,9 @@ const MagneticButton = forwardRef(function MagneticButton({ children, radius = 6
     const el = containerRef.current
     if (!el) return
 
-    // Apple Fluid Motion: smooth deceleration, no spring overshoot
-    xTo.current = gsap.quickTo(el, 'x', { duration: 0.4, ease: 'power3.out' })
-    yTo.current = gsap.quickTo(el, 'y', { duration: 0.4, ease: 'power3.out' })
+    // Physics-based: heavy friction deceleration (expo.out)
+    xTo.current = gsap.quickTo(el, 'x', { duration: 0.5, ease: 'expo.out' })
+    yTo.current = gsap.quickTo(el, 'y', { duration: 0.5, ease: 'expo.out' })
 
     const onPointerMove = (e) => {
       if (!isHovering.current) return

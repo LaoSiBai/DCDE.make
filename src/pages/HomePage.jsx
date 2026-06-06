@@ -26,9 +26,9 @@ export default function HomePage() {
         return
       }
 
-      const tl = gsap.timeline({ defaults: { ease: 'power3.out', duration: 0.35 } })
+      const tl = gsap.timeline({ defaults: { ease: 'expo.out', duration: 0.6 } })
 
-      // Logo: scale + opacity, smooth landing (no spring overshoot)
+      // Logo: scale + opacity, heavy friction deceleration
       tl.from('.hm-logo-svg', { autoAlpha: 0, scale: 0.92 })
 
       // Title char-by-char: y + rotateX + opacity
@@ -62,30 +62,30 @@ export default function HomePage() {
         }
         tl.from(chars, {
           autoAlpha: 0,
-          y: 16,
-          rotateX: -40,
-          stagger: 0.03,
-        }, '-=0.2')
+          y: 14,
+          rotateX: -30,
+          stagger: 0.06,
+        }, '-=0.4')
       }
 
       // Subtitle
-      tl.from('.hm-sub', { autoAlpha: 0, y: 12 }, '-=0.2')
+      tl.from('.hm-sub', { autoAlpha: 0, y: 10 }, '-=0.4')
 
       // Divider
       tl.from('.hm-rule', {
         autoAlpha: 0,
         scaleX: 0,
         transformOrigin: 'left center',
-        duration: 0.5,
-        ease: 'power2.inOut',
-      }, '-=0.2')
+        duration: 0.7,
+        ease: 'expo.out',
+      }, '-=0.4')
 
       // Tool rows: staggered reveal
       tl.from('.tool-row', {
         autoAlpha: 0,
-        y: 14,
-        stagger: 0.04,
-      }, '-=0.3')
+        y: 12,
+        stagger: 0.06,
+      }, '-=0.4')
     }, listRef)
   }, { scope: listRef })
 
@@ -97,13 +97,13 @@ export default function HomePage() {
     const rows = gsap.utils.toArray('.tool-row', container)
 
     const qt = rows.map((row) => ({
-      rowX: gsap.quickTo(row, 'x', { duration: 0.25, ease: 'power3.out' }),
+      rowX: gsap.quickTo(row, 'x', { duration: 0.35, ease: 'expo.out' }),
       arrowX: gsap.quickTo(row.querySelector('.tool-arrow'), 'x', {
-        duration: 0.25,
-        ease: 'power3.out',
+        duration: 0.35,
+        ease: 'expo.out',
       }),
       arrowOpacity: gsap.quickTo(row.querySelector('.tool-arrow'), 'autoAlpha', {
-        duration: 0.25,
+        duration: 0.35,
       }),
     }))
 
