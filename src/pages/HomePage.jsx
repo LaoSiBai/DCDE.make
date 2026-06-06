@@ -114,7 +114,7 @@ export default function HomePage() {
             key={tool.id}
             data-tool={tool.id}
             className="tool-row cursor-pointer border-b border-ink-faint"
-            style={{ padding: '2vh 0' }}
+            style={{ padding: '3.5vh 0' }}
             onClick={() => handleClick(tool.id)}
           >
             <div className="flex items-center justify-between gap-4">

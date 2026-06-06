@@ -101,13 +101,14 @@
   .dcde-pill {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    justify-content: center;
+    gap: 10px;
     background-color: var(--color-accent);
     color: var(--color-void);
     font-family: var(--font-family-body);
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 700;
-    padding: 14px 28px;
+    padding: 18px 40px;
     border-radius: 9999px;
     cursor: pointer;
     border: none;
@@ -159,14 +160,17 @@
   .dcde-tag {
     display: inline-flex;
     align-items: center;
+    gap: 4px;
     font-family: var(--font-family-body);
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    padding: 4px 12px;
+    padding: 8px 18px;
     border-radius: 9999px;
     white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.2s ease;
   }
 
   .dcde-tag-accent {

@@ -66,16 +66,16 @@ export default function ToolPage() {
         {/* Left: Controls */}
         <div className="lg:col-span-3">
           <div className="lg:sticky lg:top-20">
-            <div className="tp-panel bg-void-raised rounded-2xl p-6" style={{ border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div className="tp-panel bg-void-raised rounded-2xl p-8" style={{ border: '1px solid rgba(255,255,255,0.06)' }}>
               <h3 className="dcde-caption text-ink-dim mb-6">参数</h3>
-              <div className="space-y-5">
+              <div className="space-y-6">
                 <div>
                   <label className="dcde-body text-ink-dim block mb-2">输入</label>
                   <input
                     type="text"
                     placeholder="..."
                     disabled
-                    className="w-full bg-void text-ink border border-ink-faint rounded-xl px-4 py-3 text-sm outline-none focus:border-accent transition-colors"
+                    className="w-full bg-void text-ink border border-ink-faint rounded-xl px-4 py-4 text-sm outline-none focus:border-accent transition-colors"
                   />
                 </div>
                 <div>

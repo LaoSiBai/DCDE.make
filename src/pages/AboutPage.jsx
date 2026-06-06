@@ -53,7 +53,7 @@ export default function AboutPage() {
           我们相信，好的工具应该像好的设计一样——精确、直觉、没有多余的噪音。
         </p>
 
-        <div className="space-y-8">
+        <div className="space-y-12">
           {[
             { num: '01', title: '精确性优先', desc: '每一个像素、每一个数值都应该被精确控制' },
             { num: '02', title: '即时反馈', desc: '所见即所得，没有任何延迟或猜测' },
