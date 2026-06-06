@@ -28,7 +28,7 @@ export default function HomePage() {
       }, '-=0.5')
   }, { scope: listRef })
 
-  // Hover focus effect — quickTo eliminates tween accumulation
+  // Hover effect — each row independent, no cross-row animation
   useGSAP(() => {
     const container = listRef.current
     if (!container) return
@@ -36,53 +36,35 @@ export default function HomePage() {
     const rows = gsap.utils.toArray('.tool-row', container)
 
     const qt = rows.map((row) => ({
-      opacity: gsap.quickTo(row, 'opacity', { duration: 0.2, overwrite: true }),
-      arrowX: gsap.quickTo(row.querySelector('.tool-arrow'), 'x', { duration: 0.2, ease: 'power2.out', overwrite: true }),
-      arrowOpacity: gsap.quickTo(row.querySelector('.tool-arrow'), 'opacity', { duration: 0.2, overwrite: true }),
+      rowX: gsap.quickTo(row, 'x', { duration: 0.25, ease: 'power2.out' }),
+      arrowX: gsap.quickTo(row.querySelector('.tool-arrow'), 'x', { duration: 0.25, ease: 'power2.out' }),
+      arrowOpacity: gsap.quickTo(row.querySelector('.tool-arrow'), 'autoAlpha', { duration: 0.25 }),
     }))
 
-    let activeIndex = -1
-
-    const focusRow = (idx) => {
-      if (idx === activeIndex) return
-      activeIndex = idx
-      rows.forEach((row, i) => {
-        if (i === idx) {
-          qt[i].opacity(1)
-          gsap.to(row.querySelector('.tool-name'), { color: '#338bff', duration: 0.2, overwrite: 'auto' })
-          qt[i].arrowX(8)
-          qt[i].arrowOpacity(1)
-        } else {
-          qt[i].opacity(0.08)
-        }
-      })
+    const enter = (i) => {
+      gsap.to(rows[i].querySelector('.tool-index'), { color: '#338bff', duration: 0.2, overwrite: 'auto' })
+      qt[i].rowX(12)
+      qt[i].arrowX(0)
+      qt[i].arrowOpacity(1)
     }
 
-    const resetAll = () => {
-      activeIndex = -1
-      rows.forEach((row, i) => {
-        qt[i].opacity(1)
-        gsap.to(row.querySelector('.tool-name'), { color: '#ffffff', duration: 0.3, overwrite: 'auto' })
-        qt[i].arrowX(0)
-        qt[i].arrowOpacity(0)
-      })
+    const leave = (i) => {
+      gsap.to(rows[i].querySelector('.tool-index'), { color: '#ffffff', duration: 0.3, overwrite: 'auto' })
+      qt[i].rowX(0)
+      qt[i].arrowX(-8)
+      qt[i].arrowOpacity(0)
     }
 
-    const onPointerOver = (e) => {
-      const row = e.target.closest('.tool-row')
-      if (row) focusRow(rows.indexOf(row))
-    }
-
-    const onPointerOut = (e) => {
-      if (!container.contains(e.relatedTarget)) resetAll()
-    }
-
-    container.addEventListener('pointerover', onPointerOver)
-    container.addEventListener('pointerout', onPointerOut)
+    rows.forEach((row, i) => {
+      row.addEventListener('pointerenter', () => enter(i))
+      row.addEventListener('pointerleave', () => leave(i))
+    })
 
     return () => {
-      container.removeEventListener('pointerover', onPointerOver)
-      container.removeEventListener('pointerout', onPointerOut)
+      rows.forEach((row) => {
+        row.removeEventListener('pointerenter', null)
+        row.removeEventListener('pointerleave', null)
+      })
     }
   }, { scope: listRef })
 
@@ -137,7 +119,7 @@ export default function HomePage() {
           >
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-baseline gap-4 md:gap-8">
-                <span className="dcde-index flex-shrink-0 w-8 md:w-12">
+                <span className="tool-index dcde-index flex-shrink-0 w-8 md:w-12 text-ink">
                   {String(index + 1).padStart(2, '0')}
                 </span>
                 <h2 className="tool-name dcde-xl text-ink transition-colors duration-200">
