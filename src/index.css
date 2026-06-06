@@ -187,6 +187,15 @@
     background-color: rgba(255, 255, 255, 0.85);
   }
 
+  .dcde-tag-muted {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--color-ink);
+  }
+
+  .dcde-tag-muted:hover {
+    background-color: rgba(255, 255, 255, 0.18);
+  }
+
   .dcde-tag-ghost {
     background-color: transparent;
     color: var(--color-ink-dim);
