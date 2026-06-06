@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+@variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-dcde-base-dark: #0a1628;
+  --color-dcde-base-light: #f7f9fc;
+  --color-dcde-surface-dark: #111d32;
+  --color-dcde-surface-light: #ffffff;
+  --color-dcde-text-primary: #ffffff;
+  --color-dcde-text-secondary: #8896ab;
+  --color-dcde-text-dark: #0a1628;
+  --color-dcde-text-dark-secondary: #5a6a80;
+  --color-dcde-accent: #338bff;
+  --color-dcde-glow: rgba(51, 139, 255, 0.15);
+  --color-dcde-border: rgba(255, 255, 255, 0.08);
+  --color-dcde-border-dark: rgba(10, 22, 40, 0.08);
+
+  --font-family-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-family-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-family-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --spacing-18: 4.5rem;
+  --spacing-26: 6.5rem;
+  --spacing-42: 10.5rem;
+
+  --radius-hard: 0px;
+  --radius-pill: 9999px;
+
+  --shadow-hard: 4px 4px 0px 0px #000000;
+  --shadow-glow-blue: 0 0 24px rgba(51, 139, 255, 0.25);
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    font-family: var(--font-family-body);
+    background-color: var(--color-dcde-base-dark);
+    color: var(--color-dcde-text-primary);
+  }
+
+  ::selection {
+    background-color: var(--color-dcde-accent);
+    color: #ffffff;
+  }
+}
