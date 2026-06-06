@@ -28,36 +28,49 @@ export default function HomePage() {
       }, '-=0.5')
   }, { scope: listRef })
 
-  // Hover focus effect — event delegation on container
+  // Hover focus effect — quickTo eliminates tween accumulation
   useGSAP(() => {
     const container = listRef.current
     if (!container) return
 
-    const rows = container.querySelectorAll('.tool-row')
+    const rows = gsap.utils.toArray('.tool-row', container)
 
-    const focusRow = (activeRow) => {
-      rows.forEach((row) => {
-        if (row === activeRow) {
-          gsap.to(row, { opacity: 1, duration: 0.25, overwrite: true })
-          gsap.to(row.querySelector('.tool-name'), { color: '#338bff', duration: 0.25, overwrite: true })
-          gsap.to(row.querySelector('.tool-arrow'), { x: 8, opacity: 1, duration: 0.25, ease: 'power2.out', overwrite: true })
+    const qt = rows.map((row) => ({
+      opacity: gsap.quickTo(row, 'opacity', { duration: 0.2, overwrite: true }),
+      arrowX: gsap.quickTo(row.querySelector('.tool-arrow'), 'x', { duration: 0.2, ease: 'power2.out', overwrite: true }),
+      arrowOpacity: gsap.quickTo(row.querySelector('.tool-arrow'), 'opacity', { duration: 0.2, overwrite: true }),
+    }))
+
+    let activeIndex = -1
+
+    const focusRow = (idx) => {
+      if (idx === activeIndex) return
+      activeIndex = idx
+      rows.forEach((row, i) => {
+        if (i === idx) {
+          qt[i].opacity(1)
+          gsap.to(row.querySelector('.tool-name'), { color: '#338bff', duration: 0.2, overwrite: 'auto' })
+          qt[i].arrowX(8)
+          qt[i].arrowOpacity(1)
         } else {
-          gsap.to(row, { opacity: 0.08, duration: 0.25, overwrite: true })
+          qt[i].opacity(0.08)
         }
       })
     }
 
     const resetAll = () => {
-      rows.forEach((row) => {
-        gsap.to(row, { opacity: 1, duration: 0.35, overwrite: true })
-        gsap.to(row.querySelector('.tool-name'), { color: '#ffffff', duration: 0.35, overwrite: true })
-        gsap.to(row.querySelector('.tool-arrow'), { x: 0, opacity: 0, duration: 0.35, overwrite: true })
+      activeIndex = -1
+      rows.forEach((row, i) => {
+        qt[i].opacity(1)
+        gsap.to(row.querySelector('.tool-name'), { color: '#ffffff', duration: 0.3, overwrite: 'auto' })
+        qt[i].arrowX(0)
+        qt[i].arrowOpacity(0)
       })
     }
 
     const onPointerOver = (e) => {
       const row = e.target.closest('.tool-row')
-      if (row) focusRow(row)
+      if (row) focusRow(rows.indexOf(row))
     }
 
     const onPointerOut = (e) => {
