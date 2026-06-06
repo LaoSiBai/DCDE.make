@@ -2,7 +2,10 @@ import { useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { tools } from '../data/tools.registry.js'
+
+gsap.registerPlugin(ScrollTrigger)
 
 export default function HomePage() {
   const listRef = useRef(null)
@@ -11,17 +14,23 @@ export default function HomePage() {
   // Entrance animation
   useGSAP(() => {
     const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
-    tl.from('.brand-moment', { y: 30, opacity: 0, duration: 1 })
+
+    tl.from('.hm-logo-svg', { autoAlpha: 0, scale: 0.9, duration: 0.8 })
+      .from('.hm-title', { autoAlpha: 0, y: 40, duration: 1 }, '-=0.5')
+      .from('.hm-sub', { autoAlpha: 0, y: 20, duration: 0.7 }, '-=0.6')
+      .from('.hm-rule', { scaleX: 0, transformOrigin: 'left center', duration: 0.8, ease: 'power2.inOut' }, '-=0.4')
       .from('.tool-row', {
-        y: 40,
-        opacity: 0,
-        duration: 0.8,
-        stagger: 0.07,
-      }, '-=0.6')
+        autoAlpha: 0,
+        y: 30,
+        duration: 0.7,
+        stagger: 0.06,
+      }, '-=0.5')
   }, { scope: listRef })
 
-  // Hover focus effect
-  const handleMouseEnter = useCallback((e) => {
+  // Hover focus effect with contextSafe
+  const { contextSafe } = useGSAP({ scope: listRef })
+
+  const handleMouseEnter = contextSafe((e) => {
     const rows = listRef.current?.querySelectorAll('.tool-row')
     if (!rows) return
     rows.forEach((row) => {
@@ -30,20 +39,20 @@ export default function HomePage() {
         gsap.to(row.querySelector('.tool-name'), { color: '#338bff', duration: 0.25 })
         gsap.to(row.querySelector('.tool-arrow'), { x: 8, opacity: 1, duration: 0.25, ease: 'power2.out' })
       } else {
-        gsap.to(row, { opacity: 0.1, duration: 0.25 })
+        gsap.to(row, { opacity: 0.08, duration: 0.25 })
       }
     })
-  }, [])
+  })
 
-  const handleMouseLeave = useCallback(() => {
+  const handleMouseLeave = contextSafe(() => {
     const rows = listRef.current?.querySelectorAll('.tool-row')
     if (!rows) return
     rows.forEach((row) => {
-      gsap.to(row, { opacity: 1, duration: 0.3 })
-      gsap.to(row.querySelector('.tool-name'), { color: '#ffffff', duration: 0.3 })
-      gsap.to(row.querySelector('.tool-arrow'), { x: 0, opacity: 0, duration: 0.3 })
+      gsap.to(row, { opacity: 1, duration: 0.35 })
+      gsap.to(row.querySelector('.tool-name'), { color: '#ffffff', duration: 0.35 })
+      gsap.to(row.querySelector('.tool-arrow'), { x: 0, opacity: 0, duration: 0.35 })
     })
-  }, [])
+  })
 
   const categoryLabels = {
     color: '色彩',
@@ -69,6 +78,7 @@ export default function HomePage() {
       <div className="brand-moment pt-24 pb-12">
         <div className="flex items-center gap-3 md:gap-5 mb-3">
           <svg
+            className="hm-logo-svg"
             viewBox="0 0 400 406"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
@@ -79,14 +89,17 @@ export default function HomePage() {
             <path d="M276.516 234.567V264.452H262.42C251.518 264.452 242.008 266.82 233.888 271.556C225.694 276.293 219.341 282.871 214.83 291.291C210.244 299.787 207.951 309.56 207.951 320.612C207.951 331.513 210.244 341.099 214.83 349.369C219.341 357.714 225.694 364.217 233.888 368.878C242.008 373.54 251.518 375.87 262.42 375.87H276.516V405.755H261.969C243.925 405.68 228.099 402.033 214.492 394.816C200.884 387.599 190.283 377.6 182.69 364.819C175.021 352.038 171.187 337.302 171.187 320.612C171.187 303.696 175.021 288.773 182.69 275.842C190.283 262.911 200.884 252.799 214.492 245.506C228.099 238.214 243.925 234.567 261.969 234.567H276.516ZM346.66 234.567V264.452H326.023V375.87H346.66V405.755H268.735V375.87H290.838V264.452H268.735V234.567H346.66Z" fill="#338bff" />
             <path d="M223.287 149.309C223.287 136.377 225.43 124.499 229.715 113.673C234.075 102.847 240.203 93.4866 248.097 85.5925C256.066 77.7737 265.464 71.684 276.29 67.3235C287.191 63.0382 299.145 60.8955 312.151 60.8955C325.082 60.8955 336.886 63.0006 347.562 67.2107C358.313 71.4961 367.598 77.3978 375.416 84.9159C383.235 92.434 389.287 101.193 393.573 111.192C397.858 121.266 400.001 132.13 400.001 143.783C400.001 154.609 398.046 163.856 394.137 171.525C390.302 179.268 384.626 185.396 377.108 189.907C369.665 194.493 360.455 197.462 349.479 198.815V207.161L328.842 200.056C340.269 197.124 349.366 191.147 356.132 182.125C362.899 173.104 366.282 162.277 366.282 149.647C366.282 139.422 363.989 130.401 359.403 122.582C354.892 114.838 348.539 108.748 340.344 104.313C332.225 99.9522 322.827 97.7719 312.151 97.7719C304.032 97.7719 296.589 99.0124 289.822 101.493C283.056 104.05 277.192 107.583 272.23 112.094C267.343 116.68 263.584 122.131 260.953 128.446C258.321 134.761 257.006 141.715 257.006 149.309C257.006 158.03 258.697 165.849 262.08 172.765C265.539 179.757 270.388 185.546 276.628 190.132C282.868 194.718 290.198 197.801 298.619 199.379L292.529 235.466C278.62 232.985 266.441 227.798 255.991 219.904C245.616 212.085 237.571 202.123 231.858 190.019C226.144 177.99 223.287 164.42 223.287 149.309ZM328.842 200.056H397.294V235.241H328.842V200.056Z" fill="#338bff" />
           </svg>
-          <h1 className="dcde-mega text-ink leading-none">
+          <h1 className="hm-title dcde-mega text-ink leading-none">
             DCDE<span className="text-accent">·</span>make
           </h1>
         </div>
-        <p className="dcde-body text-ink-dim">
+        <p className="hm-sub dcde-body text-ink-dim">
           {tools.length} tools for visual designers
         </p>
       </div>
+
+      {/* Divider */}
+      <div className="hm-rule dcde-rule-solid mb-0" />
 
       {/* Tool Index */}
       <div className="flex-1 pb-24">
@@ -94,8 +107,8 @@ export default function HomePage() {
           <div
             key={tool.id}
             data-tool={tool.id}
-            className="tool-row cursor-pointer border-t border-ink-faint"
-            style={{ padding: '2.2vh 0' }}
+            className="tool-row cursor-pointer border-b border-ink-faint"
+            style={{ padding: '2vh 0' }}
             onClick={() => handleClick(tool.id)}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
@@ -122,7 +135,6 @@ export default function HomePage() {
             </div>
           </div>
         ))}
-        <div className="border-t border-ink-faint mt-0" />
       </div>
     </div>
   )

@@ -1,18 +1,36 @@
-import { useRef, useState, useCallback } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useRef, useLayoutEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 
 export default function PageTransition({ children }) {
   const location = useLocation()
-  const navigate = useNavigate()
-  const overlayRef = useRef(null)
-  const cloneRef = useRef(null)
-  const [isTransitioning, setIsTransitioning] = useState(false)
+  const containerRef = useRef(null)
+  const prevPath = useRef(location.pathname)
 
-  const handleExpand = useCallback((originElement, toolId) => {
-    if (isTransitioning || !originElement) return
-    setIsTransitioning(true)
+  // Entrance animation on every route change
+  useLayoutEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+
+    // Only animate if path actually changed
+    if (prevPath.current === location.pathname) return
+    prevPath.current = location.pathname
+
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        el.children[0],
+        { autoAlpha: 0, y: 24 },
+        { autoAlpha: 1, y: 0, duration: 0.7, ease: 'power3.out', clearProps: 'all' }
+      )
+    }, el)
+
+    return () => ctx.revert()
+  }, [location.pathname])
+
+  // Expose expand handler for tool row click
+  const handleExpand = (originElement, toolId) => {
+    if (!originElement) return
 
     const rect = originElement.getBoundingClientRect()
     const clone = originElement.cloneNode(true)
@@ -27,7 +45,6 @@ export default function PageTransition({ children }) {
     clone.style.pointerEvents = 'none'
     clone.style.willChange = 'transform'
     document.body.appendChild(clone)
-    cloneRef.current = clone
 
     const overlay = document.createElement('div')
     overlay.style.position = 'fixed'
@@ -36,7 +53,6 @@ export default function PageTransition({ children }) {
     overlay.style.zIndex = '9998'
     overlay.style.opacity = '0'
     document.body.appendChild(overlay)
-    overlayRef.current = overlay
 
     const viewportW = window.innerWidth
     const viewportH = window.innerHeight
@@ -48,21 +64,7 @@ export default function PageTransition({ children }) {
 
     const tl = gsap.timeline({
       onComplete: () => {
-        navigate(`/tool/${toolId}`)
-        gsap.delayedCall(0.05, () => {
-          gsap.to([clone, overlay], {
-            opacity: 0,
-            duration: 0.35,
-            ease: 'power2.in',
-            onComplete: () => {
-              clone.remove()
-              overlay.remove()
-              cloneRef.current = null
-              overlayRef.current = null
-              setIsTransitioning(false)
-            },
-          })
-        })
+        window.location.href = `/tool/${toolId}`
       },
     })
 
@@ -78,14 +80,14 @@ export default function PageTransition({ children }) {
         },
         0
       )
-  }, [isTransitioning, navigate])
+  }
 
   if (typeof window !== 'undefined') {
     window.__dcdeExpand = handleExpand
   }
 
   return (
-    <div className="relative">
+    <div ref={containerRef} className="relative">
       {children}
     </div>
   )
