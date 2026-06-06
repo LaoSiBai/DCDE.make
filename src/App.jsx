@@ -7,7 +7,6 @@ import HomePage from './pages/HomePage.jsx'
 import ToolPage from './pages/ToolPage.jsx'
 import AboutPage from './pages/AboutPage.jsx'
 import NotFoundPage from './pages/NotFoundPage.jsx'
-import { useTheme } from './hooks/useTheme.js'
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -18,17 +17,8 @@ function ScrollToTop() {
 }
 
 function App() {
-  const { theme } = useTheme()
-  const isDark = theme === 'dark'
-
   return (
-    <div
-      className={`min-h-[100dvh] transition-colors duration-500 ${
-        isDark
-          ? 'bg-dcde-base-dark text-dcde-text-primary'
-          : 'bg-dcde-base-light text-dcde-text-dark'
-      }`}
-    >
+    <div className="dcde-container min-h-[100dvh] bg-bg text-text">
       <ScrollToTop />
       <SiteHeader />
       <main>

@@ -23,7 +23,6 @@ export default function PageTransition({ children }) {
     clone.style.height = `${rect.height}px`
     clone.style.margin = '0'
     clone.style.zIndex = '9999'
-    clone.style.borderRadius = '16px'
     clone.style.overflow = 'hidden'
     clone.style.pointerEvents = 'none'
     clone.style.willChange = 'transform'
@@ -33,7 +32,7 @@ export default function PageTransition({ children }) {
     const overlay = document.createElement('div')
     overlay.style.position = 'fixed'
     overlay.style.inset = '0'
-    overlay.style.backgroundColor = '#0a1628'
+    overlay.style.backgroundColor = '#EFEFEF'
     overlay.style.zIndex = '9998'
     overlay.style.opacity = '0'
     document.body.appendChild(overlay)
@@ -74,7 +73,6 @@ export default function PageTransition({ children }) {
           x: translateX,
           y: translateY,
           scale,
-          borderRadius: 0,
           duration: 0.7,
           ease: 'power3.inOut',
         },
@@ -82,11 +80,6 @@ export default function PageTransition({ children }) {
       )
   }, [isTransitioning, navigate])
 
-  // Provide handleExpand to children via context or window temporarily
-  // Since React context might be overkill, we'll use a global event for simplicity
-  // Actually better: set a global ref that HomePage can access
-  // But to keep it clean, let's use a simple approach:
-  // We'll export handleExpand via window.__dcdeExpand for now
   if (typeof window !== 'undefined') {
     window.__dcdeExpand = handleExpand
   }
