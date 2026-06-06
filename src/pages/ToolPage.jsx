@@ -34,7 +34,7 @@ export default function ToolPage() {
     return (
       <div className="min-h-[100dvh] flex flex-col items-center justify-center" style={{ padding: '0 var(--spacing-page)' }}>
         <div className="flex flex-col items-center gap-6">
-          <span className="dcde-tag dcde-tag-ghost">404</span>
+          <span className="dcde-tag dcde-tag-accent">404</span>
           <p className="dcde-xl text-ink">工具不存在</p>
           <Link to="/" className="dcde-pill">返回首页</Link>
         </div>
@@ -48,7 +48,7 @@ export default function ToolPage() {
       <div className="pt-20 pb-6">
         <Link
           to="/"
-          className="tp-back dcde-tag dcde-tag-ghost"
+          className="tp-back dcde-tag dcde-tag-accent"
           onMouseEnter={handleBackEnter}
           onMouseLeave={handleBackLeave}
         >
@@ -68,7 +68,7 @@ export default function ToolPage() {
         <aside className="tp-sidebar w-64 flex-shrink-0 hidden lg:flex flex-col gap-6">
           <div>
             <div className="flex items-center gap-2 mb-5">
-              <span className="dcde-tag dcde-tag-ghost">{categoryLabels[tool.category]}</span>
+              <span className="dcde-tag dcde-tag-accent">{categoryLabels[tool.category]}</span>
               <span className="dcde-caption text-ink-faint">{tool.nameEn}</span>
             </div>
 
@@ -79,22 +79,22 @@ export default function ToolPage() {
                   type="text"
                   placeholder="输入值..."
                   disabled
-                  className="w-full bg-transparent text-ink border-b border-ink-faint py-3 text-sm outline-none focus:border-ink transition-colors placeholder:text-ink-faint/50"
+                  className="w-full bg-void-raised text-ink rounded-lg px-4 py-3 text-sm outline-none focus:ring-1 focus:ring-accent transition-colors placeholder:text-ink-faint/50"
                 />
               </div>
 
               <div>
                 <label className="dcde-caption text-ink-faint block mb-3">模式</label>
                 <div className="flex gap-2">
-                  <button className="dcde-tag dcde-tag-ghost border-ink-dim text-ink">A</button>
+                  <button className="dcde-tag dcde-tag-accent">A</button>
                   <button className="dcde-tag dcde-tag-ghost">B</button>
                 </div>
               </div>
 
               <div>
                 <label className="dcde-caption text-ink-faint block mb-3">强度</label>
-                <div className="h-px w-full bg-ink-faint rounded-full relative">
-                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-ink border-2 border-void" style={{ left: '66%' }} />
+                <div className="h-1.5 w-full bg-void-raised rounded-full overflow-hidden">
+                  <div className="h-full w-2/3 bg-accent rounded-full" />
                 </div>
                 <div className="flex justify-between mt-2">
                   <span className="text-[11px] text-ink-faint">0</span>
@@ -113,7 +113,7 @@ export default function ToolPage() {
         {/* Canvas */}
         <div className="tp-canvas flex-1 flex items-center justify-center rounded-3xl bg-void-raised" style={{ border: '1px solid rgba(255,255,255,0.06)' }}>
           <div className="flex flex-col items-center gap-5">
-            <span className="dcde-tag dcde-tag-ghost">Coming Soon</span>
+            <span className="dcde-tag dcde-tag-accent">Coming Soon</span>
             <p className="dcde-lg text-ink">工具开发中</p>
             <p className="dcde-body text-ink-dim">该工具正在紧锣密鼓地开发中</p>
           </div>

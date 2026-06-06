@@ -127,7 +127,7 @@ export default function HomePage() {
                 </h2>
               </div>
               <div className="flex items-center gap-4 flex-shrink-0">
-                <span className="dcde-tag dcde-tag-ghost hidden md:inline-flex">
+                <span className="dcde-tag dcde-tag-accent hidden md:inline-flex">
                   {categoryLabels[tool.category]}
                 </span>
                 <span className="tool-arrow text-accent opacity-0">

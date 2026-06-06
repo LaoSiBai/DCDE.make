@@ -6,7 +6,7 @@ export default function SiteHeader() {
       <nav>
         <Link
           to="/about"
-          className="dcde-tag dcde-tag-ghost hover:bg-accent hover:text-void hover:border-accent transition-colors duration-200"
+          className="dcde-tag dcde-tag-accent"
         >
           关于
         </Link>
