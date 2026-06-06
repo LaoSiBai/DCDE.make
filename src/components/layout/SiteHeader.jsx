@@ -6,7 +6,7 @@ export default function SiteHeader() {
       <nav>
         <Link
           to="/about"
-          className="dcde-tag dcde-tag-accent"
+          className="dcde-tag dcde-tag-ink"
         >
           关于
         </Link>

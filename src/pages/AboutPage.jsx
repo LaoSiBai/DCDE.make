@@ -35,7 +35,7 @@ export default function AboutPage() {
       <div className="pt-20 pb-12">
         <Link
           to="/"
-          className="ap-back dcde-tag dcde-tag-accent mb-8"
+          className="ap-back dcde-tag dcde-tag-ink mb-8"
           onMouseEnter={handleBackEnter}
           onMouseLeave={handleBackLeave}
         >

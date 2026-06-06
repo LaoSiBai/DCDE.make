@@ -34,7 +34,7 @@ export default function ToolPage() {
     return (
       <div className="min-h-[100dvh] flex flex-col items-center justify-center" style={{ padding: '0 var(--spacing-page)' }}>
         <div className="flex flex-col items-center gap-6">
-          <span className="dcde-tag dcde-tag-accent">404</span>
+          <span className="dcde-tag dcde-tag-ink">404</span>
           <p className="dcde-xl text-ink">工具不存在</p>
           <Link to="/" className="dcde-pill">返回首页</Link>
         </div>
@@ -48,7 +48,7 @@ export default function ToolPage() {
       <div className="pt-20 pb-6">
         <Link
           to="/"
-          className="tp-back dcde-tag dcde-tag-accent"
+          className="tp-back dcde-tag dcde-tag-ink"
           onMouseEnter={handleBackEnter}
           onMouseLeave={handleBackLeave}
         >
@@ -68,7 +68,7 @@ export default function ToolPage() {
         <aside className="tp-sidebar w-64 flex-shrink-0 hidden lg:flex flex-col gap-6">
           <div>
             <div className="flex items-center gap-2 mb-5">
-              <span className="dcde-tag dcde-tag-accent">{categoryLabels[tool.category]}</span>
+              <span className="dcde-tag dcde-tag-ink">{categoryLabels[tool.category]}</span>
               <span className="dcde-caption text-ink-faint">{tool.nameEn}</span>
             </div>
 
@@ -87,7 +87,7 @@ export default function ToolPage() {
                 <label className="dcde-caption text-ink-faint block mb-3">模式</label>
                 <div className="flex gap-2">
                   <button className="dcde-tag dcde-tag-accent">A</button>
-                  <button className="dcde-tag dcde-tag-ghost">B</button>
+                  <button className="dcde-tag dcde-tag-ink">B</button>
                 </div>
               </div>
 
@@ -113,7 +113,7 @@ export default function ToolPage() {
         {/* Canvas */}
         <div className="tp-canvas flex-1 flex items-center justify-center rounded-3xl bg-void-raised" style={{ border: '1px solid rgba(255,255,255,0.06)' }}>
           <div className="flex flex-col items-center gap-5">
-            <span className="dcde-tag dcde-tag-accent">Coming Soon</span>
+            <span className="dcde-tag dcde-tag-ink">Coming Soon</span>
             <p className="dcde-lg text-ink">工具开发中</p>
             <p className="dcde-body text-ink-dim">该工具正在紧锣密鼓地开发中</p>
           </div>

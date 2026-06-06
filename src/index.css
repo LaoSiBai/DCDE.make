@@ -178,10 +178,19 @@
     color: var(--color-void);
   }
 
+  .dcde-tag-ink {
+    background-color: var(--color-ink);
+    color: var(--color-void);
+  }
+
+  .dcde-tag-ink:hover {
+    background-color: rgba(255, 255, 255, 0.85);
+  }
+
   .dcde-tag-ghost {
     background-color: transparent;
     color: var(--color-ink-dim);
-    border: 1px solid var(--color-ink-faint);
+    border: 2px solid var(--color-ink-faint);
   }
 
   .dcde-tag-ghost:hover {
