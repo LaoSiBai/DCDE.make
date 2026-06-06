@@ -21,7 +21,7 @@ export default function PageTransition({ children }) {
       gsap.fromTo(
         el.children[0],
         { autoAlpha: 0, y: 24 },
-        { autoAlpha: 1, y: 0, duration: 0.7, ease: 'power3.out', clearProps: 'all' }
+        { autoAlpha: 1, y: 0, duration: 0.7, ease: 'power3.out', clearProps: 'opacity,visibility,y' }
       )
     }, el)
 
