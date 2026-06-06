@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useRef } from 'react'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 
@@ -8,7 +8,6 @@ export default function Cursor() {
   const yTo = useRef(null)
   const isVisible = useRef(true)
   const scale = useRef(1)
-  const targetScale = useRef(1)
 
   useGSAP(() => {
     const el = cursorRef.current
@@ -34,7 +33,6 @@ export default function Cursor() {
     }
 
     const onHoverStart = () => {
-      targetScale.current = 1.5
       gsap.to(scale, {
         current: 1.5,
         duration: 0.3,
@@ -46,7 +44,6 @@ export default function Cursor() {
     }
 
     const onHoverEnd = () => {
-      targetScale.current = 1
       gsap.to(scale, {
         current: 1,
         duration: 0.3,
@@ -59,7 +56,7 @@ export default function Cursor() {
 
     window.addEventListener('mousemove', onMouseMove)
     window.addEventListener('mouseleave', onMouseLeave)
-    window.addEventListener('mouseenter', onMouseEnter)
+    document.addEventListener('mouseenter', onMouseEnter)
 
     const cursorElements = document.querySelectorAll('[data-cursor]')
     cursorElements.forEach((el) => {
@@ -70,7 +67,7 @@ export default function Cursor() {
     return () => {
       window.removeEventListener('mousemove', onMouseMove)
       window.removeEventListener('mouseleave', onMouseLeave)
-      window.removeEventListener('mouseenter', onMouseEnter)
+      document.removeEventListener('mouseenter', onMouseEnter)
       cursorElements.forEach((el) => {
         el.removeEventListener('mouseenter', onHoverStart)
         el.removeEventListener('mouseleave', onHoverEnd)
@@ -88,7 +85,6 @@ export default function Cursor() {
       className="fixed top-0 left-0 w-2 h-2 rounded-full bg-accent pointer-events-none"
       style={{
         zIndex: 9999,
-        mixBlendMode: 'difference',
         transform: 'translate(-50%, -50%) scale(1)',
         willChange: 'transform',
       }}
