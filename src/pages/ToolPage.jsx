@@ -46,11 +46,11 @@ export default function ToolPage() {
       <div className="pt-20 pb-8">
         <Link
           to="/"
-          className="tp-back dcde-ghost text-ink-dim hover:text-accent mb-8 inline-flex items-center gap-2"
+          className="tp-back dcde-tag dcde-tag-ghost mb-8"
           onMouseEnter={handleBackEnter}
           onMouseLeave={handleBackLeave}
         >
-          <ArrowLeft className="back-arrow w-4 h-4" />
+          <ArrowLeft className="back-arrow w-3 h-3" />
           返回
         </Link>
 
@@ -81,8 +81,8 @@ export default function ToolPage() {
                 <div>
                   <label className="dcde-body text-ink-dim block mb-2">模式</label>
                   <div className="flex gap-2">
-                    <button className="flex-1 bg-accent text-void rounded-xl py-2.5 text-sm font-bold hover:brightness-110 transition-all">A</button>
-                    <button className="flex-1 bg-void-raised text-ink-dim border border-ink-faint rounded-xl py-2.5 text-sm font-medium hover:text-ink hover:border-ink-dim transition-all">B</button>
+                    <button className="dcde-tag dcde-tag-accent">A</button>
+                    <button className="dcde-tag dcde-tag-ghost">B</button>
                   </div>
                 </div>
                 <div>
@@ -110,11 +110,11 @@ export default function ToolPage() {
             style={{ minHeight: '60vh', border: '1px solid rgba(255,255,255,0.06)' }}
           >
             <div className="text-center">
-              <div className="w-16 h-16 mx-auto mb-6 rounded-full border-2 border-dashed border-accent/30 flex items-center justify-center">
-                <div className="w-3 h-3 rounded-full bg-accent/50" />
+              <div className="flex flex-col items-center gap-4">
+                <span className="dcde-tag dcde-tag-ghost">Coming Soon</span>
+                <p className="dcde-lg text-ink">工具开发中</p>
+                <p className="dcde-body text-ink-dim">该工具正在紧锣密鼓地开发中</p>
               </div>
-              <p className="dcde-lg text-ink mb-2">工具开发中</p>
-              <p className="dcde-body text-ink-dim">Coming Soon</p>
             </div>
           </div>
         </div>

@@ -35,11 +35,11 @@ export default function AboutPage() {
       <div className="pt-20 pb-12">
         <Link
           to="/"
-          className="ap-back dcde-ghost text-ink-dim hover:text-accent mb-8 inline-flex items-center gap-2"
+          className="ap-back dcde-tag dcde-tag-ghost mb-8"
           onMouseEnter={handleBackEnter}
           onMouseLeave={handleBackLeave}
         >
-          <ArrowLeft className="back-arrow w-4 h-4" />
+          <ArrowLeft className="back-arrow w-3 h-3" />
           返回
         </Link>
         <h1 className="ap-title dcde-mega text-ink mt-4">关于</h1>
@@ -55,13 +55,13 @@ export default function AboutPage() {
 
         <div className="space-y-8">
           {[
-            { title: '精确性优先', desc: '每一个像素、每一个数值都应该被精确控制' },
-            { title: '即时反馈', desc: '所见即所得，没有任何延迟或猜测' },
-            { title: '可访问性', desc: '工具本身就应该成为无障碍设计的典范' },
-            { title: '开放透明', desc: '开源、可审查、可扩展' },
+            { num: '01', title: '精确性优先', desc: '每一个像素、每一个数值都应该被精确控制' },
+            { num: '02', title: '即时反馈', desc: '所见即所得，没有任何延迟或猜测' },
+            { num: '03', title: '可访问性', desc: '工具本身就应该成为无障碍设计的典范' },
+            { num: '04', title: '开放透明', desc: '开源、可审查、可扩展' },
           ].map((item) => (
             <div key={item.title} className="ap-item flex items-start gap-4">
-              <span className="w-1.5 h-1.5 rounded-full bg-accent mt-2.5 flex-shrink-0" />
+              <span className="dcde-tag dcde-tag-accent mt-0.5">{item.num}</span>
               <div>
                 <h3 className="dcde-lg text-ink mb-1">{item.title}</h3>
                 <p className="dcde-body text-ink-dim">{item.desc}</p>

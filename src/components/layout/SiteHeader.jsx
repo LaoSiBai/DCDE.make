@@ -6,10 +6,9 @@ export default function SiteHeader() {
       <nav>
         <Link
           to="/about"
-          className="dcde-body text-ink-dim hover:text-accent transition-colors relative group inline-block"
+          className="dcde-tag dcde-tag-ghost hover:bg-accent hover:text-void hover:border-accent transition-colors duration-200"
         >
           关于
-          <span className="absolute bottom-0 left-0 w-0 h-px bg-accent group-hover:w-full transition-all duration-300" />
         </Link>
       </nav>
     </header>
