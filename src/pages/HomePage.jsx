@@ -66,7 +66,7 @@ export default function HomePage() {
   return (
     <div ref={listRef} className="min-h-[100dvh] flex flex-col" style={{ padding: '0 var(--spacing-page)' }}>
       {/* Brand Moment */}
-      <div className="brand-moment pt-24 pb-12">
+      <div className="brand-moment pt-28 pb-12">
         <h1 className="dcde-mega text-ink mb-3">
           DCDE<span className="text-accent">·</span>make
         </h1>
