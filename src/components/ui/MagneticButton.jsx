@@ -2,6 +2,8 @@ import { useRef, useEffect, forwardRef } from 'react'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 
+const isTouchDevice = typeof window !== 'undefined' && window.matchMedia('(hover: none)').matches
+
 const MagneticButton = forwardRef(function MagneticButton({ children, radius = 60, strength = 0.15, ...props }, ref) {
   const containerRef = useRef(null)
   const xTo = useRef(null)
@@ -9,6 +11,7 @@ const MagneticButton = forwardRef(function MagneticButton({ children, radius = 6
   const isHovering = useRef(false)
 
   useGSAP(() => {
+    if (isTouchDevice) return
     const el = containerRef.current
     if (!el) return
 
@@ -52,8 +55,8 @@ const MagneticButton = forwardRef(function MagneticButton({ children, radius = 6
       el.removeEventListener('pointermove', onPointerMove)
       el.removeEventListener('pointerenter', onPointerEnter)
       el.removeEventListener('pointerleave', onPointerLeave)
-      xTo.current?.kill()
-      yTo.current?.kill()
+      xTo.current = null
+      yTo.current = null
       gsap.killTweensOf(el)
     }
   }, [radius, strength])

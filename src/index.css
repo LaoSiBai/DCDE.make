@@ -50,6 +50,17 @@
     letter-spacing: -0.02em;
   }
 
+  /* Hide default cursor on mouse devices (custom cursor removed) */
+  @media (hover: hover) and (pointer: fine) {
+    html, body {
+      cursor: none;
+    }
+    /* Restore cursor for interactive elements */
+    a, button, [role="button"], input, select, textarea, .cursor-pointer, .cursor-not-allowed {
+      cursor: none;
+    }
+  }
+
   ::selection {
     background-color: var(--color-accent);
     color: var(--color-void);
