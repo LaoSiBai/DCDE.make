@@ -42,7 +42,7 @@ export default function HomePage() {
     }))
 
     const enter = (i) => {
-      gsap.to(rows[i].querySelector('.tool-index'), { color: '#338bff', duration: 0.2, overwrite: 'auto' })
+      gsap.to(rows[i].querySelector('.tool-index'), { color: '#ffffff', duration: 0.2, overwrite: 'auto' })
       qt[i].rowX(12)
       qt[i].arrowX(0)
       qt[i].arrowOpacity(1)
@@ -130,7 +130,7 @@ export default function HomePage() {
                 <span className="dcde-badge hidden md:inline-flex">
                   {categoryLabels[tool.category]}
                 </span>
-                <span className="tool-arrow text-accent opacity-0">
+                <span className="tool-arrow text-ink opacity-0">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M5 12h14M12 5l7 7-7 7" />
                   </svg>

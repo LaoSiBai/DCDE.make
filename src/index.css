@@ -204,12 +204,13 @@
   }
 
   .dcde-nav:hover {
-    color: var(--color-accent);
+    color: var(--color-ink);
+    opacity: 0.7;
   }
 
   .dcde-nav:active {
     transform: translateY(1px) scale(0.97);
-    color: var(--color-accent-active);
+    opacity: 0.5;
   }
 
   /* Tier 5 — Badge: pure information, NEVER interactive */
