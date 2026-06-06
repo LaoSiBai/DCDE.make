@@ -1,4 +1,5 @@
 import { useRef } from 'react'
+import { Link } from 'react-router-dom'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -9,17 +10,39 @@ export default function Footer() {
   const footerRef = useRef(null)
 
   useGSAP(() => {
-    gsap.from(footerRef.current, {
-      autoAlpha: 0,
-      y: 20,
-      duration: 0.8,
-      ease: 'power2.out',
-      scrollTrigger: {
-        trigger: footerRef.current,
-        start: 'top 95%',
-        once: true,
-      },
-    })
+    const el = footerRef.current
+    if (!el) return
+
+    const reduced =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    if (reduced) {
+      gsap.set(el, { autoAlpha: 1, y: 0, filter: 'none', willChange: 'auto' })
+      return
+    }
+
+    gsap.set(el, { willChange: 'filter, opacity, transform' })
+
+    gsap.fromTo(
+      el,
+      { autoAlpha: 0, y: 30, filter: 'blur(16px)' },
+      {
+        autoAlpha: 1,
+        y: 0,
+        filter: 'blur(0px)',
+        duration: 1.2,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: el,
+          start: 'top 95%',
+          once: true,
+        },
+        onComplete: () => {
+          gsap.set(el, { clearProps: 'willChange,filter' })
+        },
+      }
+    )
   }, { scope: footerRef })
 
   return (
@@ -29,6 +52,14 @@ export default function Footer() {
         <p className="dcde-caption text-ink-faint">
           © {new Date().getFullYear()} DCDE
         </p>
+
+        <Link
+          to="/about"
+          className="dcde-nav py-2 px-4"
+        >
+          关于
+        </Link>
+
         <a
           href="https://dcde.club"
           target="_blank"

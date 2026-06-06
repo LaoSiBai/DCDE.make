@@ -1,6 +1,5 @@
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { useEffect } from 'react'
-import SiteHeader from './components/layout/SiteHeader.jsx'
 import Footer from './components/layout/Footer.jsx'
 import PageTransition from './components/layout/PageTransition.jsx'
 import HomePage from './pages/HomePage.jsx'
@@ -25,7 +24,6 @@ function App() {
       <ScrollProgress />
       <RuleSweep />
       <ScrollToTop />
-      <SiteHeader />
       <main>
         <PageTransition>
           <Routes>
