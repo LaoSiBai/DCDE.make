@@ -1,4 +1,4 @@
-import { useRef, useLayoutEffect, useEffect } from 'react'
+import { useRef, useLayoutEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import gsap from 'gsap'
 

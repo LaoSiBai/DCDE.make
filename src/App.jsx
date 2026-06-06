@@ -10,6 +10,7 @@ import NotFoundPage from './pages/NotFoundPage.jsx'
 import Cursor from './components/ui/Cursor.jsx'
 import ScrollProgress from './components/ui/ScrollProgress.jsx'
 import RuleSweep from './components/ui/RuleSweep.jsx'
+import ErrorBoundary from './components/ErrorBoundary.jsx'
 
 function ScrollToTop() {
   const { pathname } = useLocation()
