@@ -1,7 +1,8 @@
-import { useState, useRef, useCallback, useEffect } from 'react'
+import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
-import { Upload, RotateCcw, Download, Loader2, ImagePlus, AlertCircle, Check } from 'lucide-react'
+import { Upload, RotateCcw, Download, Loader2, ImagePlus, AlertCircle, Check, ArrowLeft, Maximize, Focus, Minimize, Lock, Unlock, X } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { toPng } from 'html-to-image'
 import clsx from 'clsx'
 
@@ -52,7 +53,7 @@ function renderSticker(src, stroke) {
       }
       // Original image on top
       ctx.drawImage(img, 0, 0, img.naturalWidth || w, img.naturalHeight || h, pad, pad, w, h)
-      resolve(out.toDataURL('image/png'))
+      resolve({ dataUrl: out.toDataURL('image/png'), width: cw, height: ch })
     }
     img.onerror = () => reject(new Error('图片加载失败'))
     img.src = src
@@ -62,6 +63,7 @@ function renderSticker(src, stroke) {
 export default function StickerTool() {
   const [src, setSrc] = useState('/sample.png')
   const [sticker, setSticker] = useState(null)
+  const [stickerSize, setStickerSize] = useState({ width: 0, height: 0 })
   const [stroke, setStroke] = useState(2)
   const [rx, setRx] = useState(0)
   const [ry, setRy] = useState(0)
@@ -70,14 +72,25 @@ export default function StickerTool() {
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState(null)
   const [dragOver, setDragOver] = useState(false)
-  const [hintVisible, setHintVisible] = useState(true)
   const [autoRotate, setAutoRotate] = useState(true)
+  const [isFullscreen, setIsFullscreen] = useState(false)
+
+  // Export Modal State
+  const [showExportModal, setShowExportModal] = useState(false)
+  const [exportWidth, setExportWidth] = useState(0)
+  const [exportHeight, setExportHeight] = useState(0)
+  const [lockRatio, setLockRatio] = useState(true)
+  const [exportError, setExportError] = useState('')
+  const exportRatioRef = useRef(1)
+  const exportModalRef = useRef(null)
+  const exportWidthInputRef = useRef(null)
 
   // Derived: processing = src loaded but sticker not yet generated
   const processing = src !== null && sticker === null && !error
 
   const containerRef = useRef(null)
   const exportRef = useRef(null)
+  const canvasWrapperRef = useRef(null)
   const inputRef = useRef(null)
   const dragRef = useRef({ active: false, sx: 0, sy: 0, srx: 0, sry: 0 })
   const rxRef = useRef(0)
@@ -95,7 +108,12 @@ export default function StickerTool() {
     if (!src) return
     let cancel = false
     renderSticker(src, stroke)
-      .then((url) => { if (!cancel) setSticker(url) })
+      .then((result) => {
+        if (!cancel) {
+          setSticker(result.dataUrl)
+          setStickerSize({ width: result.width, height: result.height })
+        }
+      })
       .catch((e) => { if (!cancel) setError(e.message) })
     return () => { cancel = true }
   }, [src, stroke])
@@ -120,6 +138,15 @@ export default function StickerTool() {
     gsap.ticker.add(onTick)
     return () => { active = false; gsap.ticker.remove(onTick) }
   }, [sticker, autoRotate])
+
+  // Fullscreen state
+  useEffect(() => {
+    const onFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement)
+    }
+    document.addEventListener('fullscreenchange', onFullscreenChange)
+    return () => document.removeEventListener('fullscreenchange', onFullscreenChange)
+  }, [])
 
   /* ── Compute lighting from rotation ── */
   const getLighting = useCallback((rxVal, ryVal) => {
@@ -162,7 +189,7 @@ export default function StickerTool() {
     if (err) { setError(err); return }
     setError(null)
     const reader = new FileReader()
-    reader.onload = (e) => { setSrc(e.target.result); setRx(0); setRy(0); setHintVisible(true) }
+    reader.onload = (e) => { setSrc(e.target.result); setRx(0); setRy(0) }
     reader.onerror = () => setError('文件读取失败')
     reader.readAsDataURL(f)
   }, [validate])
@@ -171,6 +198,13 @@ export default function StickerTool() {
   const onDragLeave = useCallback((e) => { e.preventDefault(); setDragOver(false) }, [])
   const onDrop = useCallback((e) => { e.preventDefault(); setDragOver(false); loadFile(e.dataTransfer.files[0]) }, [loadFile])
   const onInput = useCallback((e) => { const f = e.target.files[0]; if (f) loadFile(f) }, [loadFile])
+
+  const triggerUpload = useCallback(() => {
+    if (inputRef.current) {
+      inputRef.current.value = ''
+      inputRef.current.click()
+    }
+  }, [])
 
   /* ── 3D rotation via pointer ── */
   const pauseAutoRotate = useCallback(() => {
@@ -184,9 +218,9 @@ export default function StickerTool() {
   }, [])
 
   const onPtrDown = useCallback((e) => {
+    if (e.target.closest('.controls-panel')) return
     dragRef.current = { active: true, sx: e.clientX, sy: e.clientY, srx: rxRef.current, sry: ryRef.current }
     setDragging(true)
-    setHintVisible(false)
     pauseAutoRotate()
     e.currentTarget.setPointerCapture(e.pointerId)
   }, [pauseAutoRotate])
@@ -206,17 +240,86 @@ export default function StickerTool() {
 
   const resetRotation = useCallback(() => { setRx(0); setRy(0) }, [])
 
-  const reupload = useCallback(() => {
-    setSrc(null); setSticker(null); setRx(0); setRy(0); setError(null); setHintVisible(true)
-    if (inputRef.current) inputRef.current.value = ''
+  /* ── Canvas controls ── */
+  const handleFitScreen = useCallback(() => {
+    // Reset rotation to default view
+    setRx(0)
+    setRy(0)
+  }, [])
+
+  const handleFullScreen = useCallback(() => {
+    if (!document.fullscreenElement) {
+      canvasWrapperRef.current?.requestFullscreen?.()
+    } else {
+      document.exitFullscreen?.()
+    }
+  }, [])
+
+  /* ── Export Modal ── */
+  const openExportModal = useCallback(() => {
+    if (!sticker) return
+    const baseW = stickerSize.width * 2
+    const baseH = stickerSize.height * 2
+    exportRatioRef.current = baseH / baseW
+    setExportWidth(baseW)
+    setExportHeight(baseH)
+    setLockRatio(true)
+    setExportError('')
+    setShowExportModal(true)
+    setTimeout(() => exportWidthInputRef.current?.select(), 50)
+  }, [sticker, stickerSize])
+
+  const validateExportSize = useCallback((w, h) => {
+    if (w < 10 || h < 10) return '宽高不能小于 10 px'
+    if (w > 16384 || h > 16384) return '宽高不能超过 16384 px'
+    return ''
+  }, [])
+
+  const handleWidthChange = useCallback((val) => {
+    const w = parseInt(val) || 0
+    const h = lockRatio ? Math.round(w * exportRatioRef.current) : exportHeight
+    setExportWidth(w)
+    setExportHeight(h)
+    setExportError(validateExportSize(w, h))
+  }, [lockRatio, exportHeight, validateExportSize])
+
+  const handleHeightChange = useCallback((val) => {
+    const h = parseInt(val) || 0
+    const w = lockRatio ? Math.round(h / exportRatioRef.current) : exportWidth
+    setExportHeight(h)
+    setExportWidth(w)
+    setExportError(validateExportSize(w, h))
+  }, [lockRatio, exportWidth, validateExportSize])
+
+  const handlePresetScale = useCallback((scale) => {
+    const w = Math.round(stickerSize.width * scale)
+    const h = Math.round(stickerSize.height * scale)
+    setExportWidth(w)
+    setExportHeight(h)
+    setExportError(validateExportSize(w, h))
+  }, [stickerSize, validateExportSize])
+
+  const exportPreview = useMemo(() => {
+    const previewScale = Math.min(1, 120 / exportWidth, 120 / exportHeight)
+    const previewW = Math.max(1, Math.round(exportWidth * previewScale))
+    const previewH = Math.max(1, Math.round(exportHeight * previewScale))
+    const estimatedMB = ((exportWidth * exportHeight * 4) / (1024 * 1024) * 0.3).toFixed(1)
+    return { previewW, previewH, estimatedMB }
+  }, [exportWidth, exportHeight])
+
+  const handleExportKeyDown = useCallback((e) => {
+    if (e.key === 'Escape') {
+      setShowExportModal(false)
+    }
   }, [])
 
   /* ── Export ── */
   const handleExport = useCallback(async () => {
     if (!exportRef.current || exporting) return
-    setExporting(true); setError(null)
+    setExporting(true); setError(null); setShowExportModal(false)
     try {
-      const url = await toPng(exportRef.current, { pixelRatio: 2, backgroundColor: '#050508' })
+      const pixelRatio = Math.max(1, exportWidth / stickerSize.width)
+      const url = await toPng(exportRef.current, { pixelRatio, backgroundColor: '#050508' })
       const d = new Date()
       const p = (n) => String(n).padStart(2, '0')
       const ts = `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}`
@@ -230,7 +333,7 @@ export default function StickerTool() {
     } finally {
       setExporting(false)
     }
-  }, [exporting])
+  }, [exporting, exportWidth, stickerSize])
 
   /* ── Entrance animation ── */
   useGSAP(() => {
@@ -239,150 +342,339 @@ export default function StickerTool() {
     gsap.from('.stk-upload,.stk-workspace', { autoAlpha: 0, y: 16, duration: 0.6, ease: 'expo.out', stagger: 0.1 })
   }, { scope: containerRef })
 
-  /* ── Upload View ── */
-  if (!sticker) {
-    return (
-      <div ref={containerRef} className="flex-1 flex items-center justify-center py-10">
-        <div className="stk-upload w-full max-w-lg" onDragOver={onDragOver} onDragLeave={onDragLeave} onDrop={onDrop}>
-          <div
-            className={clsx(
-              'flex flex-col items-center gap-5 rounded-3xl border-2 border-dashed p-12 transition-all duration-300 cursor-pointer',
-              dragOver ? 'border-accent bg-accent-pale' : 'border-ink-faint/30 hover:border-ink-dim/50',
-              processing && 'pointer-events-none opacity-50'
-            )}
-            onClick={() => !processing && inputRef.current?.click()}
-          >
-            {processing ? <Loader2 className="w-10 h-10 text-accent animate-spin" /> : <Upload className="w-10 h-10 text-ink-dim" />}
-            <div className="text-center">
-              <p className="dcde-body text-ink">{processing ? '处理中...' : '拖拽图片到此处，或点击上传'}</p>
-              <p className="dcde-caption text-ink-faint mt-2">支持 SVG、PNG · 最大 10MB</p>
-            </div>
-            <input ref={inputRef} type="file" accept=".svg,.png,image/svg+xml,image/png" onChange={onInput} className="hidden" />
-          </div>
-          {error && <div className="flex items-center gap-2 mt-4 text-red-400 dcde-body"><AlertCircle className="w-4 h-4 shrink-0" />{error}</div>}
-        </div>
-      </div>
-    )
-  }
-
-  /* ── Workspace View ── */
   return (
-    <div ref={containerRef} className="stk-workspace flex-1 flex flex-col lg:flex-row gap-6" style={{ minHeight: 0 }}>
-      {/* Controls */}
-      <div className="w-full lg:w-64 shrink-0 flex flex-col gap-6">
-        <div>
-          <label className="dcde-caption text-ink-faint block mb-3">描边宽度</label>
-          <div className="flex items-center gap-3">
-            <input
-              type="range" min="0" max="10" step="1"
-              value={stroke}
-              onChange={(e) => setStroke(+e.target.value)}
-              className="flex-1"
-              style={{ accentColor: 'var(--color-accent)' }}
-            />
-            <span className="text-sm text-ink-dim w-10 text-right font-mono">{stroke}px</span>
-          </div>
+    <div ref={containerRef} className="flex-1 flex flex-col bg-[#050508] text-white overflow-hidden relative">
+      {/* ── Header ── */}
+      <header className="shrink-0 h-14 md:h-16 bg-[#0a0a0f] border-b border-white/5 flex items-center justify-between px-6 z-20">
+        <div className="flex items-center gap-4">
+          <Link to="/" className="flex items-center gap-2 text-ink-dim hover:text-ink transition-colors text-sm font-medium">
+            <ArrowLeft className="w-4 h-4" /> 返回
+          </Link>
+          <div className="w-px h-4 bg-white/10" />
+          <h1 className="text-base font-bold tracking-tight">3D 贴纸生成器</h1>
         </div>
+      </header>
 
-        <div>
-          <label className="dcde-caption text-ink-faint block mb-3">旋转角度</label>
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-ink-dim">X 轴</span>
-              <span className="text-sm text-ink font-mono">{rx.toFixed(1)}°</span>
+      {/* 隐藏的文件 input */}
+      <input ref={inputRef} type="file" accept=".svg,.png,image/svg+xml,image/png" onChange={onInput} className="hidden" />
+
+      {!sticker ? (
+        /* ── Upload View ── */
+        <div className="flex-1 flex items-center justify-center py-10 min-h-0">
+          <div className="stk-upload w-full max-w-lg" onDragOver={onDragOver} onDragLeave={onDragLeave} onDrop={onDrop}>
+            <div
+              className={clsx(
+                'flex flex-col items-center gap-5 rounded-3xl border-2 border-dashed p-12 transition-all duration-300 cursor-pointer',
+                dragOver ? 'border-accent bg-accent-pale' : 'border-ink-faint/30 hover:border-ink-dim/50',
+                processing && 'pointer-events-none opacity-50'
+              )}
+              onClick={() => !processing && inputRef.current?.click()}
+            >
+              {processing ? <Loader2 className="w-10 h-10 text-accent animate-spin" /> : <Upload className="w-10 h-10 text-ink-dim" />}
+              <div className="text-center">
+                <p className="dcde-body text-ink">{processing ? '处理中…' : '拖拽图片到此处，或点击上传'}</p>
+                <p className="dcde-caption text-ink-faint mt-2">支持 SVG、PNG · 最大 10MB</p>
+              </div>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-ink-dim">Y 轴</span>
-              <span className="text-sm text-ink font-mono">{ry.toFixed(1)}°</span>
-            </div>
+            {error && <div className="flex items-center gap-2 mt-4 text-red-400 dcde-body justify-center"><AlertCircle className="w-4 h-4 shrink-0" />{error}</div>}
           </div>
         </div>
+      ) : (
+        /* ── Workspace View ── */
+        <div className="stk-workspace flex-1 flex flex-col lg:flex-row min-h-0 w-full" style={{ touchAction: 'none' }}>
 
-        <div>
-          <label className="dcde-caption text-ink-faint block mb-3">自动旋转</label>
-          <div className="flex gap-2">
-            <button onClick={() => setAutoRotate(true)} className={clsx(autoRotate ? 'dcde-tag-accent' : 'dcde-tag-muted')}>开启</button>
-            <button onClick={() => setAutoRotate(false)} className={clsx(!autoRotate ? 'dcde-tag-accent' : 'dcde-tag-muted')}>关闭</button>
-          </div>
-        </div>
+          {/* 左侧控制面板 */}
+          <aside className="w-full lg:w-72 bg-[#0d0d12] border-r border-white/5 flex flex-col shrink-0 custom-scrollbar overflow-y-auto p-6 z-10 relative">
+            <div className="flex flex-col gap-6">
+              {/* 描边宽度 */}
+              <div>
+                <label className="dcde-caption text-ink-faint block mb-3">描边宽度</label>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="range" min="0" max="10" step="1"
+                    value={stroke}
+                    onChange={(e) => setStroke(+e.target.value)}
+                    className="flex-1"
+                    style={{ accentColor: 'var(--color-accent)' }}
+                  />
+                  <span className="text-sm text-ink-dim w-10 text-right font-mono">{stroke}px</span>
+                </div>
+              </div>
 
-        <div className="space-y-3">
-          <button onClick={resetRotation} className="dcde-tag-muted w-full justify-center gap-2">
-            <RotateCcw className="w-3.5 h-3.5" />重置旋转
-          </button>
-          <button onClick={reupload} className="dcde-tag-muted w-full justify-center gap-2">
-            <ImagePlus className="w-3.5 h-3.5" />重新上传
-          </button>
-        </div>
+              {/* 旋转角度 */}
+              <div>
+                <label className="dcde-caption text-ink-faint block mb-3">旋转角度</label>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-ink-dim">X 轴</span>
+                    <span className="text-sm text-ink font-mono">{rx.toFixed(1)}°</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-ink-dim">Y 轴</span>
+                    <span className="text-sm text-ink font-mono">{ry.toFixed(1)}°</span>
+                  </div>
+                </div>
+              </div>
 
-        <div className="dcde-rule-solid" />
+              {/* 自动旋转 */}
+              <div>
+                <label className="dcde-caption text-ink-faint block mb-3">自动旋转</label>
+                <div className="flex gap-2">
+                  <button onClick={() => setAutoRotate(true)} className={clsx(autoRotate ? 'dcde-tag-accent' : 'dcde-tag-muted', 'flex-1 justify-center')}>开启</button>
+                  <button onClick={() => setAutoRotate(false)} className={clsx(!autoRotate ? 'dcde-tag-accent' : 'dcde-tag-muted', 'flex-1 justify-center')}>关闭</button>
+                </div>
+              </div>
 
-        <button onClick={handleExport} disabled={exporting} className={clsx('dcde-pill w-full justify-center', exporting && 'opacity-70 cursor-wait')}>
-          {exporting ? <><Loader2 className="w-4 h-4 animate-spin" />导出中...</> : <><Download className="w-4 h-4" />导出 PNG</>}
-        </button>
+              {/* 重置旋转 */}
+              <button onClick={resetRotation} className="dcde-tag-muted w-full justify-center gap-2">
+                <RotateCcw className="w-3.5 h-3.5" />重置旋转
+              </button>
 
-        {success && <div className="flex items-center gap-2 text-emerald-400 text-sm"><Check className="w-4 h-4 shrink-0" />导出成功</div>}
-        {error && <div className="flex items-center gap-2 text-red-400 text-sm"><AlertCircle className="w-4 h-4 shrink-0" />{error}</div>}
-      </div>
-
-      {/* Preview */}
-      <div
-        className={clsx(
-          'flex-1 flex items-center justify-center rounded-3xl bg-void-raised select-none overflow-hidden relative',
-          dragging ? 'cursor-grabbing' : 'cursor-grab'
-        )}
-        style={{ border: '1px solid rgba(255,255,255,0.06)', perspective: '800px', minHeight: '300px' }}
-        onPointerDown={onPtrDown}
-        onPointerMove={onPtrMove}
-        onPointerUp={onPtrUp}
-      >
-        <div
-          ref={exportRef}
-          className="flex items-center justify-center w-full h-full"
-          style={{ padding: '40px', backgroundColor: '#050508', borderRadius: '24px' }}
-        >
-          {(() => {
-            const light = getLighting(rx, ry)
-            return (
+              {/* 拖拽重新上传区 */}
               <div
-                className="relative max-w-full max-h-[60vh]"
-                style={{
-                  transform: `rotateX(${rx}deg) rotateY(${ry}deg)`,
-                  transition: dragging ? 'none' : 'transform 0.15s ease-out',
-                  transformStyle: 'preserve-3d',
-                  filter: `drop-shadow(${light.shadowOffsetX}px ${light.shadowOffsetY}px ${light.shadowBlur}px rgba(0,0,0,0.55))`,
-                }}
+                onClick={triggerUpload}
+                onDragOver={onDragOver}
+                onDragLeave={onDragLeave}
+                onDrop={onDrop}
+                className={clsx(
+                  'mt-2 flex flex-col items-center justify-center gap-2 py-6 px-4 rounded-xl border-2 border-dashed transition-all cursor-pointer',
+                  dragOver ? 'border-accent bg-accent-pale' : 'border-white/10 hover:border-white/30 bg-void'
+                )}
               >
-                <img
-                  src={sticker}
-                  alt="3D Sticker"
-                  draggable={false}
-                  className="object-contain max-w-full max-h-[60vh]"
-                  style={{
-                    filter: `brightness(${light.brightness})`,
-                    transition: dragging ? 'none' : 'filter 0.15s ease-out',
-                  }}
-                />
-                {/* Lighting overlay — follows rotation */}
+                <ImagePlus className="w-5 h-5 text-ink-dim" />
+                <span className="text-sm text-ink-dim">点击或拖拽新图片</span>
+              </div>
+
+              <div className="dcde-rule-solid" />
+
+              {/* 导出按钮 */}
+              <div className="space-y-3">
+                <button onClick={openExportModal} disabled={!sticker} className={clsx('dcde-pill w-full justify-center', !sticker && 'opacity-70 cursor-not-allowed')}>
+                  <Download className="w-4 h-4" /> 导出 PNG
+                </button>
+              </div>
+
+              {success && <div className="flex items-center gap-2 text-emerald-400 text-sm"><Check className="w-4 h-4 shrink-0" />导出成功</div>}
+              {error && <div className="flex items-center gap-2 text-red-400 text-sm"><AlertCircle className="w-4 h-4 shrink-0" />{error}</div>}
+            </div>
+          </aside>
+
+          {/* 右侧预览区 */}
+          <div
+            ref={canvasWrapperRef}
+            className={clsx(
+              'flex-1 flex items-center justify-center select-none overflow-hidden relative min-w-0 min-h-0',
+              dragging ? 'cursor-grabbing' : 'cursor-grab'
+            )}
+            style={{ backgroundColor: '#18181b', perspective: '800px' }}
+            onPointerDown={onPtrDown}
+            onPointerMove={onPtrMove}
+            onPointerUp={onPtrUp}
+          >
+            <div
+              ref={exportRef}
+              className="flex items-center justify-center w-full h-full"
+              style={{ padding: '40px', backgroundColor: '#050508' }}
+            >
+              {(() => {
+                const light = getLighting(rx, ry)
+                return (
+                  <div
+                    className="relative max-w-full max-h-[60vh]"
+                    style={{
+                      transform: `rotateX(${rx}deg) rotateY(${ry}deg)`,
+                      transition: dragging ? 'none' : 'transform 0.15s ease-out',
+                      transformStyle: 'preserve-3d',
+                      filter: `drop-shadow(${light.shadowOffsetX}px ${light.shadowOffsetY}px ${light.shadowBlur}px rgba(0,0,0,0.55))`,
+                    }}
+                  >
+                    <img
+                      src={sticker}
+                      alt="3D Sticker"
+                      draggable={false}
+                      className="object-contain max-w-full max-h-[60vh]"
+                      style={{
+                        filter: `brightness(${light.brightness})`,
+                        transition: dragging ? 'none' : 'filter 0.15s ease-out',
+                      }}
+                    />
+                    {/* Lighting overlay — follows rotation */}
+                    <div
+                      className="absolute inset-0 pointer-events-none rounded-[inherit]"
+                      style={{
+                        background: light.gradient,
+                        transition: dragging ? 'none' : 'background 0.15s ease-out',
+                        mixBlendMode: 'overlay',
+                      }}
+                    />
+                  </div>
+                )
+              })()}
+            </div>
+
+            {/* 右上角浮动控件 */}
+            <div className="controls-panel absolute top-6 right-6 flex items-center gap-2 z-20">
+              <button
+                onClick={handleFitScreen}
+                className="dcde-pill bg-void/50 backdrop-blur-md hover:bg-void text-ink border border-white/10"
+                title="重置视角"
+              >
+                <Focus className="w-4 h-4" />
+              </button>
+              <button
+                onClick={handleFullScreen}
+                className="dcde-pill bg-void/50 backdrop-blur-md hover:bg-void text-ink border border-white/10"
+                title="全屏"
+              >
+                {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Export Modal */}
+      {showExportModal && (
+        <div
+          ref={exportModalRef}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+          onKeyDown={handleExportKeyDown}
+          onClick={(e) => { if (e.target === e.currentTarget) setShowExportModal(false) }}
+        >
+          <div className="bg-[#0d0d12] border border-white/10 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 pt-6 pb-0">
+              <h3 className="text-lg font-bold">导出 PNG</h3>
+              <button
+                onClick={() => setShowExportModal(false)}
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-ink-faint hover:text-ink hover:bg-white/5 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Preview */}
+            <div className="px-6 pt-4 pb-2 flex items-center justify-center">
+              <div
+                className="rounded-lg border border-white/10 bg-[#18181b] flex items-center justify-center overflow-hidden"
+                style={{ width: Math.max(exportPreview.previewW, 40), height: Math.max(exportPreview.previewH, 30) }}
+              >
                 <div
-                  className="absolute inset-0 pointer-events-none rounded-[inherit]"
-                  style={{
-                    background: light.gradient,
-                    transition: dragging ? 'none' : 'background 0.15s ease-out',
-                    mixBlendMode: 'overlay',
-                  }}
+                  className="rounded bg-[#050508]"
+                  style={{ width: Math.max(exportPreview.previewW - 8, 8), height: Math.max(exportPreview.previewH - 6, 6) }}
                 />
               </div>
-            )
-          })()}
+            </div>
+            <div className="px-6 pb-1 text-center">
+              <span className="dcde-caption text-ink-faint">
+                {exportWidth} × {exportHeight} px · 约 {exportPreview.estimatedMB} MB
+              </span>
+            </div>
+
+            {/* Preset scales */}
+            <div className="px-6 pt-3">
+              <label className="dcde-caption text-ink-faint block mb-2">快捷倍率</label>
+              <div className="flex gap-2">
+                {[
+                  { label: '1×', scale: 1 },
+                  { label: '2×', scale: 2 },
+                  { label: '4×', scale: 4 },
+                  { label: '8×', scale: 8 },
+                ].map((p) => (
+                  <button
+                    key={p.label}
+                    onClick={() => handlePresetScale(p.scale)}
+                    className="flex-1 py-1.5 rounded-lg text-xs font-medium transition-colors border bg-white/5 text-ink-dim border-white/10 hover:bg-white/10 hover:text-ink"
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Width / Height inputs */}
+            <div className="px-6 pt-4">
+              <div className="flex items-end gap-3">
+                <div className="flex-1">
+                  <label className="dcde-caption text-ink-faint block mb-2">宽度</label>
+                  <div className="relative">
+                    <input
+                      ref={exportWidthInputRef}
+                      type="number"
+                      min="10"
+                      max="16384"
+                      value={exportWidth}
+                      onChange={(e) => handleWidthChange(e.target.value)}
+                      className="w-full bg-[#18181b] text-ink rounded-lg px-4 py-2.5 pr-10 text-sm outline-none focus:ring-1 focus:ring-accent/60 font-mono text-center transition-colors"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-ink-faint pointer-events-none">px</span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setLockRatio((v) => !v)}
+                  className={clsx(
+                    'w-9 h-9 rounded-lg flex items-center justify-center transition-colors mb-0.5',
+                    lockRatio
+                      ? 'bg-accent/15 text-accent border border-accent/30'
+                      : 'bg-white/5 text-ink-faint border border-white/10 hover:text-ink hover:bg-white/10'
+                  )}
+                  title={lockRatio ? '解锁宽高比' : '锁定宽高比'}
+                >
+                  {lockRatio ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
+                </button>
+
+                <div className="flex-1">
+                  <label className="dcde-caption text-ink-faint block mb-2">高度</label>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      min="10"
+                      max="16384"
+                      value={exportHeight}
+                      onChange={(e) => handleHeightChange(e.target.value)}
+                      className="w-full bg-[#18181b] text-ink rounded-lg px-4 py-2.5 pr-10 text-sm outline-none focus:ring-1 focus:ring-accent/60 font-mono text-center transition-colors"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-ink-faint pointer-events-none">px</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Error */}
+            {exportError && (
+              <div className="px-6 pt-3 flex items-center gap-2 text-red-400 text-sm">
+                <AlertCircle className="w-3.5 h-3.5 shrink-0" />{exportError}
+              </div>
+            )}
+
+            {/* Footer buttons */}
+            <div className="px-6 pt-4 pb-6 flex items-center justify-between">
+              <span className="text-xs text-ink-faint">Enter 确认 · Esc 取消</span>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowExportModal(false)}
+                  className="px-4 py-2 rounded-lg text-sm font-medium text-ink-faint hover:text-ink hover:bg-white/5 transition-colors"
+                >
+                  取消
+                </button>
+                <button
+                  onClick={handleExport}
+                  disabled={exporting || !!exportError}
+                  className={clsx(
+                    "dcde-pill",
+                    (exporting || !!exportError) && "opacity-50 cursor-not-allowed"
+                  )}
+                >
+                  {exporting ? <><Loader2 className="w-4 h-4 animate-spin" />导出中…</> : <><Download className="w-4 h-4" />导出</>}
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-        <p className={clsx(
-          'absolute bottom-4 left-1/2 -translate-x-1/2 dcde-caption text-ink-faint pointer-events-none transition-opacity duration-500',
-          hintVisible ? 'opacity-100' : 'opacity-0'
-        )}>
-          拖拽旋转
-        </p>
-      </div>
+      )}
     </div>
   )
 }
+
+StickerTool.isAppLayout = true
