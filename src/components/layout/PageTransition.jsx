@@ -1,8 +1,9 @@
 import { useRef, useLayoutEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import gsap from 'gsap'
+import clsx from 'clsx'
 
-export default function PageTransition({ children }) {
+export default function PageTransition({ children, className }) {
   const location = useLocation()
   const containerRef = useRef(null)
   const lastKeyRef = useRef(null)
@@ -49,7 +50,7 @@ export default function PageTransition({ children }) {
   }, [location.key])
 
   return (
-    <div ref={containerRef} className="relative">
+    <div ref={containerRef} className={clsx("relative", className)}>
       {children}
     </div>
   )

@@ -27,7 +27,7 @@
 
   /* Font */
   --font-family-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
-  --font-family-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-family-body: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
 
   /* Spacing */
   --spacing-page: 4vw;
@@ -65,7 +65,7 @@
   /* Display — extreme scale */
   .dcde-mega {
     font-family: var(--font-family-display);
-    font-size: clamp(56px, 9vw, 140px);
+    font-size: clamp(40px, 12vw, 140px);
     font-weight: 900;
     line-height: 0.9;
     letter-spacing: -0.04em;
@@ -73,7 +73,7 @@
 
   .dcde-xl {
     font-family: var(--font-family-display);
-    font-size: clamp(36px, 5vw, 72px);
+    font-size: clamp(28px, 6vw, 72px);
     font-weight: 900;
     line-height: 0.95;
     letter-spacing: -0.03em;
@@ -81,7 +81,7 @@
 
   .dcde-lg {
     font-family: var(--font-family-display);
-    font-size: clamp(24px, 3vw, 40px);
+    font-size: clamp(20px, 4vw, 40px);
     font-weight: 700;
     line-height: 1.1;
     letter-spacing: -0.02em;
@@ -90,7 +90,7 @@
   /* Body */
   .dcde-body {
     font-family: var(--font-family-body);
-    font-size: clamp(14px, 1.2vw, 18px);
+    font-size: clamp(14px, 1.4vw, 18px);
     font-weight: 500;
     line-height: 1.5;
   }
@@ -115,7 +115,7 @@
     justify-content: center;
     gap: 10px;
     background-color: var(--color-accent);
-    color: var(--color-void);
+    color: var(--color-ink);
     font-family: var(--font-family-body);
     font-size: 15px;
     font-weight: 700;
@@ -130,11 +130,10 @@
 
   .dcde-pill:hover {
     background-color: var(--color-accent-active);
-    transform: translateY(-2px);
   }
 
   .dcde-pill:active {
-    transform: translateY(0) scale(0.97);
+    transform: scale(0.97);
   }
 
   /* Tier 2 — Active: selected state, small capsule */
@@ -143,7 +142,7 @@
     align-items: center;
     gap: 4px;
     background-color: var(--color-accent);
-    color: var(--color-void);
+    color: var(--color-ink);
     font-family: var(--font-family-body);
     font-size: 12px;
     font-weight: 700;
@@ -313,6 +312,21 @@
   .dcde-footer-link:active {
     transform: scale(0.96);
     opacity: 0.5;
+  }
+}
+
+/* ==========================================================================
+   Mobile touch targets
+   ========================================================================== */
+
+@media (max-width: 640px) {
+  .dcde-footer-link {
+    min-height: 44px;
+    padding: 12px 0;
+  }
+
+  .dcde-pill {
+    padding: 16px 32px;
   }
 }
 

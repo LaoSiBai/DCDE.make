@@ -91,7 +91,7 @@ export default function AboutPage() {
 
   return (
     <div ref={pageRef} className="min-h-[100dvh]" style={{ padding: '0 var(--spacing-page)' }}>
-      <div className="pt-20 pb-12">
+      <div className="pt-16 md:pt-20 pb-10 md:pb-12">
         <Link
           to="/"
           className="ap-back dcde-nav mb-8"
@@ -104,12 +104,13 @@ export default function AboutPage() {
         <h1 className="ap-title dcde-mega text-ink mt-4">关于</h1>
       </div>
 
-      <div className="ap-rule dcde-rule-solid mb-12" />
+      <div className="ap-rule dcde-rule-solid mb-10 md:mb-12" />
 
-      <div className="max-w-3xl pb-24">
-        <p className="ap-lead dcde-xl text-ink-dim mb-12" style={{ lineHeight: 1.4 }}>
-          DCDE·make 是 DCDE 为视觉设计师打造的工具合集。<br />
-          我们相信，好的工具应该像好的设计一样——精确、直觉、没有多余的噪音。
+      <div className="max-w-3xl pb-16 md:pb-24">
+        <p className="ap-lead dcde-xl text-ink-dim mb-10 md:mb-12" style={{ lineHeight: 1.4 }}>
+          我们甄选优秀的设计作品，提炼其核心元素，并以代码精准复刻。
+          <span className="hidden sm:inline"><br /></span>
+          DCDE·make 让这一过程更高效、更便捷。
         </p>
 
         <div className="space-y-12">

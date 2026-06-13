@@ -1,18 +1,31 @@
-export const categories = [
-  { id: 'all', label: '全部' },
-  { id: 'color', label: '色彩' },
-  { id: 'layout', label: '布局' },
-  { id: 'typography', label: '字体' },
-  { id: 'asset', label: '素材' },
-  { id: 'accessibility', label: '无障碍' },
-]
+// Categories removed for now
 
 export const tools = [
+  {
+    id: 'ascii-art',
+    name: 'ASCII 艺术',
+    nameEn: 'ASCII Art',
+    updatedAt: '2026.06.13',
+    description: '将图片转换为轻量级的 ASCII 字符画',
+    descriptionEn: 'Convert images to lightweight ASCII art',
+    featured: true,
+    span: 'col-span-2 row-span-2',
+  },
+  {
+    id: '3d-sticker',
+    name: '3D贴纸',
+    nameEn: '3D Sticker',
+    updatedAt: '2026.06.13',
+    description: '为图片添加白色描边，3D旋转预览并导出',
+    descriptionEn: 'Add white stroke to images, preview with 3D rotation and export',
+    featured: true,
+    span: 'col-span-2 row-span-2',
+  },
   {
     id: 'color-converter',
     name: '色彩转换器',
     nameEn: 'Color Converter',
-    category: 'color',
+    updatedAt: '2026.06.12',
     description: 'HEX / RGB / HSL / OKLCH 多格式互转，实时预览对比',
     descriptionEn: 'Convert between HEX, RGB, HSL and OKLCH with live preview',
     featured: true,
@@ -22,7 +35,7 @@ export const tools = [
     id: 'grid-system',
     name: '网格系统',
     nameEn: 'Grid System',
-    category: 'layout',
+    updatedAt: '2026.06.10',
     description: '可视化生成响应式网格，导出 CSS Grid 代码',
     descriptionEn: 'Generate responsive grid layouts and export CSS Grid code',
     featured: false,
@@ -32,7 +45,7 @@ export const tools = [
     id: 'type-scale',
     name: '字体比例',
     nameEn: 'Type Scale',
-    category: 'typography',
+    updatedAt: '2026.06.08',
     description: '基于数学比例的字体层级生成器',
     descriptionEn: 'Generate type hierarchies based on mathematical ratios',
     featured: true,
@@ -42,7 +55,7 @@ export const tools = [
     id: 'aspect-ratio',
     name: '比例计算器',
     nameEn: 'Aspect Ratio',
-    category: 'layout',
+    updatedAt: '2026.06.05',
     description: '常用画面比例换算与容器适配',
     descriptionEn: 'Calculate aspect ratios and container fittings',
     featured: false,
@@ -52,7 +65,7 @@ export const tools = [
     id: 'contrast-checker',
     name: '对比度检查',
     nameEn: 'Contrast Checker',
-    category: 'accessibility',
+    updatedAt: '2026.06.01',
     description: 'WCAG 标准下的色彩对比度即时检测',
     descriptionEn: 'Instant WCAG contrast ratio checking',
     featured: false,
@@ -62,7 +75,7 @@ export const tools = [
     id: 'svg-placeholder',
     name: '占位图形',
     nameEn: 'SVG Placeholder',
-    category: 'asset',
+    updatedAt: '2026.05.28',
     description: '生成自定义 SVG 占位符与图案背景',
     descriptionEn: 'Generate custom SVG placeholders and pattern backgrounds',
     featured: true,
@@ -72,7 +85,7 @@ export const tools = [
     id: 'spacing-token',
     name: '间距令牌',
     nameEn: 'Spacing Token',
-    category: 'layout',
+    updatedAt: '2026.05.20',
     description: '基于斐波那契或 4pt 体系的间距系统生成',
     descriptionEn: 'Generate spacing systems based on Fibonacci or 4pt grid',
     featured: false,
@@ -82,7 +95,7 @@ export const tools = [
     id: 'gradient-lab',
     name: '渐变实验室',
     nameEn: 'Gradient Lab',
-    category: 'color',
+    updatedAt: '2026.05.15',
     description: '多色阶渐变生成与 CSS 导出',
     descriptionEn: 'Multi-stop gradient generator with CSS export',
     featured: false,
@@ -94,7 +107,3 @@ export function getToolById(id) {
   return tools.find((t) => t.id === id)
 }
 
-export function getToolsByCategory(categoryId) {
-  if (categoryId === 'all') return tools
-  return tools.filter((t) => t.category === categoryId)
-}
