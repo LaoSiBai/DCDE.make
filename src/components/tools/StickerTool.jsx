@@ -386,7 +386,7 @@ export default function StickerTool() {
         </div>
       ) : (
         /* ── Workspace View ── */
-        <div className="stk-workspace flex-1 flex flex-col-reverse md:flex-row min-h-0 w-full" style={{ touchAction: 'none' }}>
+        <div className="stk-workspace flex-1 flex flex-col-reverse md:flex-row min-h-0 w-full bg-[#18181b] md:bg-transparent" style={{ touchAction: 'none' }}>
 
           {/* 左侧控制面板 */}
           <aside data-lenis-prevent="true" className={clsx(

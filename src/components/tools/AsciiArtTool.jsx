@@ -947,7 +947,7 @@ export default function AsciiArtTool() {
           </div>
         </div>
       ) : (
-        <div className="stk-workspace flex-1 flex flex-col-reverse md:flex-row min-h-0 w-full" style={{ touchAction: 'none' }}>
+        <div className="stk-workspace flex-1 flex flex-col-reverse md:flex-row min-h-0 w-full bg-[#18181b] md:bg-transparent" style={{ touchAction: 'none' }}>
           
           <aside data-lenis-prevent="true" className={clsx(
             "w-full md:w-72 h-[45vh] md:h-auto bg-[#0d0d12] border-t md:border-t-0 border-r-0 md:border-r border-white/5 flex-col shrink-0 custom-scrollbar overflow-y-auto p-4 md:p-6 z-10 relative rounded-t-3xl md:rounded-none",
