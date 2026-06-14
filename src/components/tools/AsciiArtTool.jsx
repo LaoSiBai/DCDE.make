@@ -78,7 +78,6 @@ export default function AsciiArtTool() {
   const [exportSuccess, setExportSuccess] = useState(false)
   const [error, setError] = useState(null)
   const [dragOver, setDragOver] = useState(false)
-  const [isFullscreen, setIsFullscreen] = useState(false)
 
   // Export Modal State
   const [showExportModal, setShowExportModal] = useState(false)
