@@ -381,10 +381,10 @@ export default function StickerTool() {
         </div>
       ) : (
         /* ── Workspace View ── */
-        <div className="stk-workspace flex-1 flex flex-col lg:flex-row min-h-0 w-full" style={{ touchAction: 'none' }}>
+        <div className="stk-workspace flex-1 flex flex-col-reverse lg:flex-row min-h-0 w-full" style={{ touchAction: 'none' }}>
 
           {/* 左侧控制面板 */}
-          <aside data-lenis-prevent="true" className="w-full lg:w-72 bg-[#0d0d12] border-r border-white/5 flex flex-col shrink-0 custom-scrollbar overflow-y-auto p-6 z-10 relative">
+          <aside data-lenis-prevent="true" className="w-full lg:w-72 h-[45vh] lg:h-auto bg-[#0d0d12] border-t lg:border-t-0 border-r-0 lg:border-r border-white/5 flex flex-col shrink-0 custom-scrollbar overflow-y-auto p-4 lg:p-6 z-10 relative">
             <div className="flex flex-col gap-6">
               {/* 描边宽度 */}
               <div>
