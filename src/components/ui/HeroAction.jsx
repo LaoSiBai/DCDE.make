@@ -68,7 +68,7 @@ export default function HeroAction({ onScroll }) {
       {/* Expanded Container */}
       <div 
         ref={expandedRef}
-        className="flex items-center"
+        className="hidden md:flex items-center overflow-hidden"
         style={{ width: 0, opacity: 0, visibility: 'hidden' }}
       >
         <div className="flex items-center gap-3 whitespace-nowrap">
