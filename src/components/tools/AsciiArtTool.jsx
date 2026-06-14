@@ -91,7 +91,8 @@ export default function AsciiArtTool() {
   // Infinite Canvas State
   const [transform, setTransform] = useState({ x: 0, y: 0, scale: 1 })
   const [dragging, setDragging] = useState(false)
-  const dragRef = useRef({ active: false, startX: 0, startY: 0, tx: 0, ty: 0 })
+  const dragRef = useRef({ active: false, startX: 0, startY: 0, tx: 0, ty: 0, mode: 'pan' })
+  const pointersRef = useRef(new Map())
 
   const containerRef = useRef(null)
   const canvasWrapperRef = useRef(null)
@@ -391,24 +392,86 @@ export default function AsciiArtTool() {
   /* ── Canvas Pan & Zoom ── */
   const handlePointerDown = useCallback((e) => {
     if (e.target.closest('.controls-panel')) return
-    dragRef.current = { active: true, startX: e.clientX, startY: e.clientY, tx: transform.x, ty: transform.y }
-    setDragging(true)
     e.currentTarget.setPointerCapture(e.pointerId)
+    pointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY })
+
+    if (pointersRef.current.size === 1) {
+      dragRef.current = { active: true, startX: e.clientX, startY: e.clientY, tx: transform.x, ty: transform.y, mode: 'pan' }
+      setDragging(true)
+    } else if (pointersRef.current.size === 2) {
+      const pts = Array.from(pointersRef.current.values())
+      const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y)
+      const cx = (pts[0].x + pts[1].x) / 2
+      const cy = (pts[0].y + pts[1].y) / 2
+      
+      const wrapper = canvasWrapperRef.current
+      const rect = wrapper.getBoundingClientRect()
+      const mx = cx - rect.left - rect.width / 2
+      const my = cy - rect.top - rect.height / 2
+
+      dragRef.current = { 
+        active: true, 
+        mode: 'pinch', 
+        startDist: dist, 
+        startScale: transform.scale,
+        startX: transform.x,
+        startY: transform.y,
+        mx, my,
+        pinchCX: cx, pinchCY: cy
+      }
+    }
   }, [transform])
 
   const handlePointerMove = useCallback((e) => {
-    if (!dragRef.current.active) return
-    setTransform(prev => ({
-      ...prev,
-      x: dragRef.current.tx + (e.clientX - dragRef.current.startX),
-      y: dragRef.current.ty + (e.clientY - dragRef.current.startY)
-    }))
+    if (!pointersRef.current.has(e.pointerId)) return
+    pointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY })
+
+    const d = dragRef.current
+    if (!d.active) return
+
+    if (pointersRef.current.size === 1 && d.mode === 'pan') {
+      setTransform(prev => ({
+        ...prev,
+        x: d.tx + (e.clientX - d.startX),
+        y: d.ty + (e.clientY - d.startY)
+      }))
+    } else if (pointersRef.current.size === 2 && d.mode === 'pinch') {
+      const pts = Array.from(pointersRef.current.values())
+      const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y)
+      const cx = (pts[0].x + pts[1].x) / 2
+      const cy = (pts[0].y + pts[1].y) / 2
+
+      setTransform(prev => {
+        const scaleChange = dist / d.startDist
+        const newScale = Math.max(0.05, Math.min(20, d.startScale * scaleChange))
+        const ratio = newScale / d.startScale
+
+        const dx = cx - d.pinchCX
+        const dy = cy - d.pinchCY
+
+        return {
+          x: d.mx - (d.mx - d.startX) * ratio + dx,
+          y: d.my - (d.my - d.startY) * ratio + dy,
+          scale: newScale
+        }
+      })
+    }
   }, [])
 
   const handlePointerUp = useCallback((e) => {
-    dragRef.current.active = false
-    setDragging(false)
+    pointersRef.current.delete(e.pointerId)
     e.currentTarget.releasePointerCapture(e.pointerId)
+    
+    if (pointersRef.current.size === 0) {
+      dragRef.current.active = false
+      setDragging(false)
+    } else if (pointersRef.current.size === 1) {
+      const [ptr] = pointersRef.current.values()
+      setTransform(prev => {
+        dragRef.current = { active: true, startX: ptr.x, startY: ptr.y, tx: prev.x, ty: prev.y, mode: 'pan' }
+        return prev
+      })
+    }
   }, [])
 
   useEffect(() => {
