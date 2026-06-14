@@ -63,6 +63,8 @@ export default function AsciiArtTool() {
   const [resolution, setResolution] = useState(100)
   const [charSet, setCharSet] = useState(DEFAULT_CHARSET)
   const [colorMode, setColorMode] = useState(true)
+  const [isFullscreen, setIsFullscreen] = useState(false)
+  const [mobileFullscreen, setMobileFullscreen] = useState(false)
   const [renderStyle, setRenderStyle] = useState('classic')
   const [edgeThreshold, setEdgeThreshold] = useState(30)
   const [brailleThreshold, setBrailleThreshold] = useState(128)
@@ -539,10 +541,14 @@ export default function AsciiArtTool() {
   }, [])
 
   const handleFullScreen = useCallback(() => {
-    if (!document.fullscreenElement) {
-      canvasWrapperRef.current?.requestFullscreen?.()
+    if (window.innerWidth < 768) {
+      setMobileFullscreen(prev => !prev)
     } else {
-      document.exitFullscreen?.()
+      if (!document.fullscreenElement) {
+        canvasWrapperRef.current?.requestFullscreen?.()
+      } else {
+        document.exitFullscreen?.()
+      }
     }
   }, [])
 
@@ -944,7 +950,10 @@ export default function AsciiArtTool() {
       ) : (
         <div className="stk-workspace flex-1 flex flex-col-reverse md:flex-row min-h-0 w-full" style={{ touchAction: 'none' }}>
           
-          <aside data-lenis-prevent="true" className="w-full md:w-72 h-[45vh] md:h-auto bg-[#0d0d12] border-t md:border-t-0 border-r-0 md:border-r border-white/5 flex flex-col shrink-0 custom-scrollbar overflow-y-auto p-4 md:p-6 z-10 relative">
+          <aside data-lenis-prevent="true" className={clsx(
+            "w-full md:w-72 h-[45vh] md:h-auto bg-[#0d0d12] border-t md:border-t-0 border-r-0 md:border-r border-white/5 flex-col shrink-0 custom-scrollbar overflow-y-auto p-4 md:p-6 z-10 relative rounded-t-3xl md:rounded-none",
+            mobileFullscreen ? "hidden md:flex" : "flex"
+          )}>
             <div className="flex flex-col gap-6">
               <div>
                 <label className="dcde-caption text-ink-faint block mb-3">分辨率 ({renderStyle === 'braille' ? '细粒度网格' : '字符宽度'})</label>
@@ -1189,7 +1198,7 @@ export default function AsciiArtTool() {
                 className="dcde-pill bg-void/50 backdrop-blur-md hover:bg-void text-ink border border-white/10"
                 title="全屏"
               >
-                {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
+                {isFullscreen || mobileFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
               </button>
             </div>
           </div>
