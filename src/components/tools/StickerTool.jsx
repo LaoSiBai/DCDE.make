@@ -343,7 +343,7 @@ export default function StickerTool() {
   }, { scope: containerRef })
 
   return (
-    <div ref={containerRef} className="flex-1 flex flex-col bg-[#050508] text-white overflow-hidden relative">
+    <div ref={containerRef} className="flex-1 flex flex-col bg-[#050508] text-white overflow-hidden relative min-h-0">
       {/* ── Header ── */}
       <header className="shrink-0 h-14 md:h-16 bg-[#0a0a0f] border-b border-white/5 flex items-center justify-between px-6 z-20">
         <div className="flex items-center gap-4">
@@ -384,7 +384,7 @@ export default function StickerTool() {
         <div className="stk-workspace flex-1 flex flex-col lg:flex-row min-h-0 w-full" style={{ touchAction: 'none' }}>
 
           {/* 左侧控制面板 */}
-          <aside className="w-full lg:w-72 bg-[#0d0d12] border-r border-white/5 flex flex-col shrink-0 custom-scrollbar overflow-y-auto p-6 z-10 relative">
+          <aside data-lenis-prevent="true" className="w-full lg:w-72 bg-[#0d0d12] border-r border-white/5 flex flex-col shrink-0 custom-scrollbar overflow-y-auto p-6 z-10 relative">
             <div className="flex flex-col gap-6">
               {/* 描边宽度 */}
               <div>

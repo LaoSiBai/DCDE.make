@@ -66,6 +66,8 @@ export default function AsciiArtTool() {
   const [renderStyle, setRenderStyle] = useState('classic')
   const [edgeThreshold, setEdgeThreshold] = useState(30)
   const [brailleThreshold, setBrailleThreshold] = useState(128)
+  const [contrastEnhance, setContrastEnhance] = useState(0)
+  const [charBg, setCharBg] = useState(false)
 
   const [colorMapText, setColorMapText] = useState('#000000, #1e003b, #70005d, #d1005a, #ff6600, #ffe600')
   
@@ -99,7 +101,7 @@ export default function AsciiArtTool() {
   const parsedDataRef = useRef(null)
   const rafRef = useRef(null)
 
-  // 1. Parse Image (Run once on src/resolution/renderStyle change)
+  // 1. Parse Image (Run once on src/resolution/renderStyle/contrastEnhance change)
   useEffect(() => {
     if (!src) return
     const isBraille = renderStyle === 'braille'
@@ -134,19 +136,23 @@ export default function AsciiArtTool() {
         }
       }
 
-      // 自动对比度拉伸：将实际亮度范围归一化到 0~255
-      let minLum = 255, maxLum = 0
-      for (let i = 0; i < lumArray.length; i++) {
-        if (data[i * 4 + 3] >= 128) {
-          if (lumArray[i] < minLum) minLum = lumArray[i]
-          if (lumArray[i] > maxLum) maxLum = lumArray[i]
-        }
-      }
-      const lumRange = maxLum - minLum
-      if (lumRange > 1) {
+      // 对比度增强拉伸
+      if (contrastEnhance > 0) {
+        let minLum = 255, maxLum = 0
         for (let i = 0; i < lumArray.length; i++) {
           if (data[i * 4 + 3] >= 128) {
-            lumArray[i] = ((lumArray[i] - minLum) / lumRange) * 255
+            if (lumArray[i] < minLum) minLum = lumArray[i]
+            if (lumArray[i] > maxLum) maxLum = lumArray[i]
+          }
+        }
+        const lumRange = maxLum - minLum
+        if (lumRange > 1) {
+          const factor = contrastEnhance / 100
+          for (let i = 0; i < lumArray.length; i++) {
+            if (data[i * 4 + 3] >= 128) {
+              const stretched = ((lumArray[i] - minLum) / lumRange) * 255
+              lumArray[i] = lumArray[i] * (1 - factor) + stretched * factor
+            }
           }
         }
       }
@@ -180,7 +186,7 @@ export default function AsciiArtTool() {
     img.src = src
 
     return () => { cancel = true }
-  }, [src, resolution, renderStyle])
+  }, [src, resolution, renderStyle, contrastEnhance])
 
   // 2. Viewport Render Engine
   const drawCanvas = useCallback(() => {
@@ -223,8 +229,6 @@ export default function AsciiArtTool() {
     ctx.translate(cx + transform.x, cy + transform.y)
     ctx.scale(transform.scale, transform.scale)
     
-    // isBraille comes from parsedDataRef, NOT from renderStyle state,
-    // so we always render with the style that matches the parsed data dimensions.
     const logicalCols = isBraille ? Math.ceil(width / 2) : width
     const logicalRows = isBraille ? Math.ceil(height / 4) : height
     const logicalWidthPx = logicalCols * charWidth
@@ -297,12 +301,18 @@ export default function AsciiArtTool() {
                }
              }
            }
-           if (brailleValue > 0 || !colorMode) {
+           if (brailleValue > 0 || (!colorMode && sumA > 0) || (charBg && sumA > 0)) {
              const rawChar = String.fromCharCode(0x2800 + brailleValue)
+             let colorStr = '#e4e4e7'
              if (colorMode && sumA > 0) {
-               ctx.fillStyle = `rgb(${Math.round(sumR/count)},${Math.round(sumG/count)},${Math.round(sumB/count)})`
+               colorStr = `rgb(${Math.round(sumR/count)},${Math.round(sumG/count)},${Math.round(sumB/count)})`
+             }
+             if (charBg && sumA > 0) {
+               ctx.fillStyle = colorStr
+               ctx.fillRect(x * charWidth, y * lineHeight, charWidth, lineHeight)
+               ctx.fillStyle = '#050508'
              } else {
-               ctx.fillStyle = '#e4e4e7'
+               ctx.fillStyle = colorStr
              }
              ctx.fillText(rawChar, x * charWidth, y * lineHeight)
            }
@@ -332,15 +342,22 @@ export default function AsciiArtTool() {
             rawChar = charArray[charIdx]
           }
           
-          if (colorMode && a >= 128) {
-            if (renderStyle === 'colormap') {
-              ctx.fillStyle = sampleGradient(colorPalette, luminance / 255)
-            } else {
-              ctx.fillStyle = `rgb(${r},${g},${b})`
+          if (a >= 128) {
+            let colorStr = '#e4e4e7'
+            if (colorMode) {
+              if (renderStyle === 'colormap') {
+                colorStr = sampleGradient(colorPalette, luminance / 255)
+              } else {
+                colorStr = `rgb(${r},${g},${b})`
+              }
             }
-            ctx.fillText(rawChar, x * charWidth, y * lineHeight)
-          } else if (!colorMode && a >= 128) {
-            ctx.fillStyle = '#e4e4e7'
+            if (charBg) {
+              ctx.fillStyle = colorStr
+              ctx.fillRect(x * charWidth, y * lineHeight, charWidth, lineHeight)
+              ctx.fillStyle = '#050508'
+            } else {
+              ctx.fillStyle = colorStr
+            }
             ctx.fillText(rawChar, x * charWidth, y * lineHeight)
           }
         }
@@ -348,7 +365,7 @@ export default function AsciiArtTool() {
     }
     
     ctx.restore()
-  }, [transform, charSet, colorMode, renderStyle, edgeThreshold, brailleThreshold, colorMapText])
+  }, [transform, charSet, colorMode, renderStyle, edgeThreshold, brailleThreshold, colorMapText, charBg])
 
   useEffect(() => {
     if (rafRef.current) cancelAnimationFrame(rafRef.current)
@@ -705,12 +722,18 @@ export default function AsciiArtTool() {
                    }
                  }
                }
-               if (brailleValue > 0 || !colorMode) {
+               if (brailleValue > 0 || (!colorMode && sumA > 0) || (charBg && sumA > 0)) {
                  const rawChar = String.fromCharCode(0x2800 + brailleValue)
+                 let colorStr = '#e4e4e7'
                  if (colorMode && sumA > 0) {
-                   ctx.fillStyle = `rgb(${Math.round(sumR/count)},${Math.round(sumG/count)},${Math.round(sumB/count)})`
+                   colorStr = `rgb(${Math.round(sumR/count)},${Math.round(sumG/count)},${Math.round(sumB/count)})`
+                 }
+                 if (charBg && sumA > 0) {
+                   ctx.fillStyle = colorStr
+                   ctx.fillRect(pad + cx * charWidth, pad + cy * lineHeight, charWidth, lineHeight)
+                   ctx.fillStyle = '#050508'
                  } else {
-                   ctx.fillStyle = '#e4e4e7'
+                   ctx.fillStyle = colorStr
                  }
                  ctx.fillText(rawChar, pad + cx * charWidth, pad + cy * lineHeight)
                }
@@ -741,15 +764,22 @@ export default function AsciiArtTool() {
                 rawChar = charArray[charIdx]
               }
               
-              if (colorMode && a >= 128) {
-                if (renderStyle === 'colormap') {
-                  ctx.fillStyle = sampleGradient(colorPalette, luminance / 255)
-                } else {
-                  ctx.fillStyle = `rgb(${r},${g},${b})`
+              if (a >= 128) {
+                let colorStr = '#e4e4e7'
+                if (colorMode) {
+                  if (renderStyle === 'colormap') {
+                    colorStr = sampleGradient(colorPalette, luminance / 255)
+                  } else {
+                    colorStr = `rgb(${r},${g},${b})`
+                  }
                 }
-                ctx.fillText(rawChar, pad + cx * charWidth, pad + cy * lineHeight)
-              } else if (!colorMode && a >= 128) {
-                ctx.fillStyle = '#e4e4e7'
+                if (charBg) {
+                  ctx.fillStyle = colorStr
+                  ctx.fillRect(pad + cx * charWidth, pad + cy * lineHeight, charWidth, lineHeight)
+                  ctx.fillStyle = '#050508'
+                } else {
+                  ctx.fillStyle = colorStr
+                }
                 ctx.fillText(rawChar, pad + cx * charWidth, pad + cy * lineHeight)
               }
             }
@@ -773,7 +803,7 @@ export default function AsciiArtTool() {
         setExporting(false)
       }
     })
-  }, [exporting, charSet, colorMode, renderStyle, edgeThreshold, brailleThreshold, colorMapText, exportWidth, exportHeight])
+  }, [exporting, charSet, colorMode, renderStyle, edgeThreshold, brailleThreshold, colorMapText, exportWidth, exportHeight, charBg])
 
   /* ── File handling ── */
   const validate = useCallback((f) => {
@@ -816,7 +846,7 @@ export default function AsciiArtTool() {
   }, { scope: containerRef })
 
   return (
-    <div ref={containerRef} className="flex-1 flex flex-col bg-[#050508] text-white overflow-hidden relative">
+    <div ref={containerRef} className="flex-1 flex flex-col bg-[#050508] text-white overflow-hidden relative min-h-0">
       <header className="shrink-0 h-14 md:h-16 bg-[#0a0a0f] border-b border-white/5 flex items-center justify-between px-6 z-20">
         <div className="flex items-center gap-4">
           <Link to="/" className="flex items-center gap-2 text-ink-dim hover:text-ink transition-colors text-sm font-medium">
@@ -851,7 +881,7 @@ export default function AsciiArtTool() {
       ) : (
         <div className="stk-workspace flex-1 flex flex-col lg:flex-row min-h-0 w-full" style={{ touchAction: 'none' }}>
           
-          <aside className="w-full lg:w-72 bg-[#0d0d12] border-r border-white/5 flex flex-col shrink-0 custom-scrollbar overflow-y-auto p-6 z-10 relative">
+          <aside data-lenis-prevent="true" className="w-full lg:w-72 bg-[#0d0d12] border-r border-white/5 flex flex-col shrink-0 custom-scrollbar overflow-y-auto p-6 z-10 relative">
             <div className="flex flex-col gap-6">
               <div>
                 <label className="dcde-caption text-ink-faint block mb-3">分辨率 ({renderStyle === 'braille' ? '细粒度网格' : '字符宽度'})</label>
@@ -864,6 +894,20 @@ export default function AsciiArtTool() {
                     style={{ accentColor: 'var(--color-accent)' }}
                   />
                   <span className="text-sm text-ink-dim w-10 text-right font-mono">{resolution}</span>
+                </div>
+              </div>
+
+              <div>
+                <label className="dcde-caption text-ink-faint block mb-3">对比度增强</label>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="range" min="0" max="100" step="5"
+                    value={contrastEnhance}
+                    onChange={(e) => setContrastEnhance(+e.target.value)}
+                    className="flex-1"
+                    style={{ accentColor: 'var(--color-accent)' }}
+                  />
+                  <span className="text-sm text-ink-dim w-10 text-right font-mono">{contrastEnhance}%</span>
                 </div>
               </div>
 
@@ -1015,6 +1059,14 @@ export default function AsciiArtTool() {
                 <div className="flex gap-2">
                   <button onClick={() => setColorMode(true)} className={clsx(colorMode ? 'dcde-tag-accent' : 'dcde-tag-muted', 'flex-1 justify-center')}>彩色</button>
                   <button onClick={() => setColorMode(false)} className={clsx(!colorMode ? 'dcde-tag-accent' : 'dcde-tag-muted', 'flex-1 justify-center')}>单色</button>
+                </div>
+              </div>
+
+              <div>
+                <label className="dcde-caption text-ink-faint block mb-3">字符底色 (背景映射)</label>
+                <div className="flex gap-2">
+                  <button onClick={() => setCharBg(true)} className={clsx(charBg ? 'dcde-tag-accent' : 'dcde-tag-muted', 'flex-1 justify-center')}>开启</button>
+                  <button onClick={() => setCharBg(false)} className={clsx(!charBg ? 'dcde-tag-accent' : 'dcde-tag-muted', 'flex-1 justify-center')}>关闭</button>
                 </div>
               </div>
 

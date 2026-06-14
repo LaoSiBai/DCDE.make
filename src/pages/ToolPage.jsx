@@ -148,7 +148,7 @@ export default function ToolPage() {
                     type="text"
                     placeholder="输入值..."
                     disabled
-                    className="w-full bg-void-raised text-ink rounded-lg px-4 py-3 text-sm outline-none focus:ring-1 focus:ring-ink-dim transition-colors placeholder:text-ink-faint/50 opacity-50 cursor-not-allowed"
+                    className="w-full bg-[#18181b] text-ink rounded-lg px-4 py-3 text-sm outline-none focus:ring-1 focus:ring-ink-dim transition-colors placeholder:text-ink-faint/50 opacity-50 cursor-not-allowed"
                   />
                 </div>
 

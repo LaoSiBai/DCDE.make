@@ -27,8 +27,8 @@ function App() {
       <div className={clsx("bg-void text-ink flex flex-col", isAppLayout ? "h-[100dvh] overflow-hidden" : "min-h-[100dvh]")}>
         <RuleSweep />
         {!isAppLayout && <Header />}
-        <main className={isAppLayout ? "flex-1 flex flex-col" : "pt-14 md:pt-16 flex-1 flex flex-col"}>
-          <PageTransition className="flex-1 flex flex-col">
+        <main className={isAppLayout ? "flex-1 flex flex-col min-h-0" : "pt-14 md:pt-16 flex-1 flex flex-col min-h-0"}>
+          <PageTransition className="flex-1 flex flex-col min-h-0">
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/tool/:toolId" element={<ToolPage />} />
